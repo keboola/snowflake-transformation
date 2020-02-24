@@ -17,7 +17,7 @@ class ConfigDefinition extends BaseConfigDefinition
         $parametersNode
             ->children()
                 ->scalarNode('runId')->end()
-                ->scalarNode('queryTimeout')
+                ->scalarNode('queryTimeout')->end()
                 ->arrayNode('db')
                     ->isRequired()
                     ->children()
