@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyComponent;
+namespace SnowflakeTransformation;
 
 use Keboola\Component\Config\BaseConfigDefinition;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -16,8 +16,42 @@ class ConfigDefinition extends BaseConfigDefinition
         /** @noinspection NullPointerExceptionInspection */
         $parametersNode
             ->children()
-                ->scalarNode('foo')
-                    ->defaultValue('baz')
+                ->scalarNode('runId')->end()
+                ->scalarNode('queryTimeout')
+                ->arrayNode('db')
+                    ->isRequired()
+                    ->children()
+                        ->scalarNode('host')->end()
+                        ->scalarNode('port')->end()
+                        ->scalarNode('database')
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->scalarNode('schema')->end()
+                        ->scalarNode('user')
+                            ->isRequired()
+                        ->end()
+                        ->scalarNode('password')
+                            ->isRequired()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('steps')
+                    ->prototype('array')
+                    ->children()
+                        ->scalarNode('name')->end()
+                        ->enumNode('execution')
+                            ->values(['parallel', 'serial'])
+                        ->end()
+                        ->arrayNode('blocks')
+                            ->prototype('array')
+                            ->children()
+                                ->scalarNode('name')->end()
+                                ->arrayNode('script')
+                                    ->prototype('scalar')->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;
