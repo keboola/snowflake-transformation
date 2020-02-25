@@ -32,7 +32,7 @@ class SnowflakeTransformation
         $this->connection = $this->createConnection();
     }
 
-    public function setSession(Config $config)
+    public function setSession(Config $config): void
     {
         $sessionVariables = [];
         $sessionVariables['QUERY_TAG'] = sprintf("'%s'", json_encode(['runId' => $config->getRunId()]));
@@ -41,12 +41,12 @@ class SnowflakeTransformation
             $sessionVariables['STATEMENT_TIMEOUT_IN_SECONDS'] = $config->getQueryTimeout();
         }
 
-        array_walk($sessionVariables, function (&$item, $key) {
+        array_walk($sessionVariables, function (&$item, $key): void {
             $item = vsprintf(
                 '%s=%s',
                 [
                     $key,
-                    $item
+                    $item,
                 ]
             );
         });
