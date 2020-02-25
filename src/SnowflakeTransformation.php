@@ -8,6 +8,7 @@ use Keboola\Component\UserException;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
+use Keboola\SnowflakeTransformation\Exception\DeadConnectionException;
 use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
@@ -21,17 +22,14 @@ class SnowflakeTransformation
     /** @var LoggerInterface $logger */
     private $logger;
 
+    /** @var array $databaseConfig */
+    private $databaseConfig;
+
     public function __construct(Config $config, LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->connection = new Connection($config->getDatabaseConfig());
-        try {
-            if (!empty($config->getDatabaseSchema())) {
-                $this->connection->query(sprintf('USE SCHEMA %s', QueryBuilder::quoteIdentifier($config->getDatabaseSchema())));
-            }
-        } catch (CannotAccessObjectException $e) {
-            throw new UserException($e->getMessage(), 0, $e);
-        }
+        $this->databaseConfig = $config->getDatabaseConfig();
+        $this->connection = $this->createConnection();
     }
 
     public function setSession(Config $config)
@@ -80,7 +78,26 @@ class SnowflakeTransformation
         }
     }
 
-    private function runRetriableQuery(string $query, string $errorMessage)
+    private function createConnection(): Connection
+    {
+        $connection = new Connection($this->databaseConfig);
+        try {
+            if (!empty($this->databaseConfig['schema'])) {
+                $connection->query(
+                    sprintf(
+                        'USE SCHEMA %s',
+                        QueryBuilder::quoteIdentifier($this->databaseConfig['schema'])
+                    )
+                );
+            }
+        } catch (CannotAccessObjectException $e) {
+            throw new UserException($e->getMessage(), 0, $e);
+        }
+
+        return $connection;
+    }
+
+    private function runRetriableQuery(string $query, string $errorMessage): void
     {
         $retryPolicy = new SimpleRetryPolicy(
             SimpleRetryPolicy::DEFAULT_MAX_ATTEMPTS,
@@ -89,15 +106,41 @@ class SnowflakeTransformation
         $backoffPolicy = new ExponentialBackOffPolicy();
         $retryProxy = new RetryProxy($retryPolicy, $backoffPolicy);
 
-        $retryProxy->call(function () use ($query, $errorMessage): void {
-            try {
-                $this->connection->query($query);
-            } catch (\Throwable $e) {
-                throw $e;
-            }
-        });
+        try {
+            $retryProxy->call(function () use ($query): void {
+                try {
+                    $this->connection->query($query);
+                } catch (\Throwable $exception) {
+                    $this->tryReconnect();
+                    throw $exception;
+                }
+            });
+        } catch (\Throwable $exception) {
+            $message = sprintf('%s: %s', $errorMessage, $exception->getMessage());
+            throw new UserException($message, 0, $exception);
+        }
     }
 
+    private function tryReconnect(): void
+    {
+        try {
+            $this->isAlive();
+        } catch (DeadConnectionException $deadConnectionException) {
+            $this->connection = $this->createConnection();
+        }
+    }
 
+    private function testConnection(): void
+    {
+        $this->connection->query('SELECT 1;');
+    }
 
+    protected function isAlive(): void
+    {
+        try {
+            $this->testConnection();
+        } catch (\Throwable $e) {
+            throw new DeadConnectionException('Dead connection: ' . $e->getMessage());
+        }
+    }
 }
