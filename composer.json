@@ -1,6 +1,8 @@
 {
     "name": "keboola/snowflake-transformation",
+    "description": "Backend for Snowflake Transformations",
     "type": "project",
+    "license": "MIT",
     "require": {
         "php": "^7.4",
         "keboola/db-adapter-snowflake": "1.0.4",
