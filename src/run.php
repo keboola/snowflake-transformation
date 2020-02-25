@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 use Keboola\Component\UserException;
 use Keboola\Component\Logger;
-use MyComponent\Component;
+use SnowflakeTransformation\SnowflakeTransformationComponent;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $logger = new Logger();
 try {
-    $app = new Component($logger);
+    $app = new SnowflakeTransformationComponent($logger);
     $app->execute();
     exit(0);
 } catch (UserException $e) {

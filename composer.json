@@ -1,7 +1,11 @@
 {
+    "name": "keboola/snowflake-transformation",
+    "type": "project",
     "require": {
-        "php": "^7.1",
-        "keboola/php-component": "^7.0.1"
+        "php": "^7.4",
+        "keboola/db-adapter-snowflake": "1.0.4",
+        "keboola/php-component": "^7.0.1",
+        "keboola/retry": "^0.5.0"
     },
     "require-dev": {
         "jakub-onderka/php-parallel-lint": "^1.0",
@@ -14,13 +18,13 @@
     },
     "autoload": {
         "psr-4": {
-            "MyComponent\\": "src/"
+            "SnowflakeTransformation\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MyComponent\\Tests\\": "tests/phpunit/",
-            "MyComponent\\FunctionalTests\\": "tests/functional/"
+            "SnowflakeTransformation\\Tests\\": "tests/phpunit/",
+            "SnowflakeTransformation\\FunctionalTests\\": "tests/functional/"
         }
     },
     "scripts": {

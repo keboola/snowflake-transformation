@@ -23,6 +23,7 @@ class ConfigDefinition extends BaseConfigDefinition
                     ->children()
                         ->scalarNode('host')->end()
                         ->scalarNode('port')->end()
+                        ->scalarNode('warehouse')->end()
                         ->scalarNode('database')
                             ->cannotBeEmpty()
                         ->end()

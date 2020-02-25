@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SnowflakeTransformation;
+
+use Keboola\Component\BaseComponent;
+use Keboola\Component\Logger;
+
+class SnowflakeTransformationComponent extends BaseComponent
+{
+    protected function run(): void
+    {
+        /** @var Config $config */
+        $config = $this->getConfig();
+
+        $snowflakeTransformation = new SnowflakeTransformation($config, $this->getLogger());
+
+        $snowflakeTransformation->setSession($config);
+
+        $snowflakeTransformation->processSteps($config->getSteps());
+    }
+
+    protected function getConfigClass(): string
+    {
+        return Config::class;
+    }
+
+    protected function getConfigDefinitionClass(): string
+    {
+        return ConfigDefinition::class;
+    }
+}
