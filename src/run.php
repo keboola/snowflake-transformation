@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Keboola\Component\UserException;
 use Keboola\Component\Logger;
-use SnowflakeTransformation\SnowflakeTransformationComponent;
+use Keboola\SnowflakeTransformation\SnowflakeTransformationComponent;
 
 require __DIR__ . '/../vendor/autoload.php';
 

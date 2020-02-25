@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SnowflakeTransformation;
+namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\Config\BaseConfig;
 

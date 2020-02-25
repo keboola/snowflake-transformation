@@ -18,13 +18,12 @@
     },
     "autoload": {
         "psr-4": {
-            "SnowflakeTransformation\\": "src/"
+            "Keboola\\SnowflakeTransformation\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SnowflakeTransformation\\Tests\\": "tests/phpunit/",
-            "SnowflakeTransformation\\FunctionalTests\\": "tests/functional/"
+            "Keboola\\SnowflakeTransformation\\Tests\\": "tests/phpunit/"
         }
     },
     "scripts": {

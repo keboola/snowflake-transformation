@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SnowflakeTransformation;
+namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\BaseComponent;
-use Keboola\Component\Logger;
 
 class SnowflakeTransformationComponent extends BaseComponent
 {
