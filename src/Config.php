@@ -29,11 +29,11 @@ class Config extends BaseConfig
 
     public function getDatabaseConfig(): array
     {
-        return $this->getValue(['parameters', 'db']);
+        return $this->getValue(['authorization']);
     }
 
     public function getDatabaseSchema(): string
     {
-        return $this->getValue(['parameters', 'db', 'schema']);
+        return $this->getValue(['authorization', 'schema']);
     }
 }
