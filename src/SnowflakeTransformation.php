@@ -118,7 +118,7 @@ class SnowflakeTransformation
                 }
             });
         } catch (\Throwable $exception) {
-            $message = sprintf('%s: %s', $errorMessage, $exception->getMessage());
+            $message = sprintf('[%s] Invalid query: "%s"', $errorMessage, $query);
             throw new UserException($message, 0, $exception);
         }
     }
