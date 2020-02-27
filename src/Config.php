@@ -17,11 +17,6 @@ class Config extends BaseConfig
         }
     }
 
-    public function getRunId(): string
-    {
-        return $this->getValue(['runId']);
-    }
-
     public function getSteps(): array
     {
         return $this->getValue(['parameters', 'steps']);
@@ -30,10 +25,5 @@ class Config extends BaseConfig
     public function getDatabaseConfig(): array
     {
         return $this->getValue(['authorization']);
-    }
-
-    public function getDatabaseSchema(): string
-    {
-        return $this->getValue(['authorization', 'schema']);
     }
 }
