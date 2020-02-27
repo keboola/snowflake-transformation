@@ -35,7 +35,7 @@ class SnowflakeTransformation
     public function setSession(Config $config): void
     {
         $sessionVariables = [];
-        $sessionVariables['QUERY_TAG'] = sprintf("'%s'", json_encode(['runId' => $config->getRunId()]));
+        $sessionVariables['QUERY_TAG'] = sprintf("'%s'", json_encode(['runId' => getenv('KBC_RUNID')]));
 
         if ($config->getQueryTimeout()) {
             $sessionVariables['STATEMENT_TIMEOUT_IN_SECONDS'] = $config->getQueryTimeout();
