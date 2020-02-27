@@ -2,6 +2,16 @@ version: '2'
 services:
   dev:
     build: .
+    environment:
+      - SNOWFLAKE_HOST
+      - SNOWFLAKE_PORT
+      - SNOWFLAKE_WAREHOUSE
+      - SNOWFLAKE_DATABASE
+      - SNOWFLAKE_SCHEMA
+      - SNOWFLAKE_USER
+      - SNOWFLAKE_PASSWORD
+      - STORAGE_API_TOKEN
+      - KBC_RUNID
     volumes:
       - ./:/code
       - ./data:/data
