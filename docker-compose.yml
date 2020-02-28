@@ -1,7 +1,9 @@
 version: '2'
 services:
-  dev:
-    build: .
+  app: &base
+    build:
+      context: .
+    image: keboola/snowflake-transformation
     environment:
       - SNOWFLAKE_HOST
       - SNOWFLAKE_PORT
@@ -12,6 +14,8 @@ services:
       - SNOWFLAKE_PASSWORD
       - STORAGE_API_TOKEN
       - KBC_RUNID
+  dev:
+    <<: *base
     volumes:
       - ./:/code
       - ./data:/data
