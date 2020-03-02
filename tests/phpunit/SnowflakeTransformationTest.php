@@ -43,7 +43,7 @@ class SnowflakeTransformationTest extends AbstractBaseTest
         $this->assertEmpty($process->getErrorOutput(), $process->getErrorOutput());
     }
 
-    public function testInvalidQuery(): void
+    public function testQueryFailed(): void
     {
         $config = [
             'authorization' => $this->getDatabaseConfig(),
@@ -70,7 +70,7 @@ class SnowflakeTransformationTest extends AbstractBaseTest
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger, $this->dataDir);
 
         $this->expectException(UserException::class);
-        $this->expectExceptionMessage('[first block] Invalid query: "test invalid query"');
+        $this->expectExceptionMessage('[first block] Query failed: "test invalid query"');
         $snowflakeTransformation->execute();
     }
 }
