@@ -7,17 +7,15 @@
         "php": "^7.4",
         "keboola/db-adapter-snowflake": "1.0.4",
         "keboola/php-component": "^7.0.1",
+        "keboola/php-temp": "^2.0",
         "keboola/retry": "^0.5.0"
     },
     "require-dev": {
         "jakub-onderka/php-parallel-lint": "^1.0",
         "keboola/coding-standard": ">=7.0.2",
-        "keboola/datadir-tests": "^2.0",
-        "keboola/php-temp": "^1.0",
-        "keboola/storage-api-client": "^10.11",
         "phpstan/phpstan": "^0.12.11",
-        "phpunit/phpunit": "^7.0",
-        "symfony/process": "^4.0"
+        "phpunit/phpunit": "^9.0",
+        "symfony/process": "^5.0"
     },
     "autoload": {
         "psr-4": {
