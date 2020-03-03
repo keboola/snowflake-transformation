@@ -92,7 +92,7 @@ class SnowflakeTransformation
         return $connection;
     }
 
-    private function runRetriableQuery(string $query, string $errorMessage): void
+    private function runRetryableQuery(string $query, string $errorMessage): void
     {
         $retryPolicy = new SimpleRetryPolicy(
             SimpleRetryPolicy::DEFAULT_MAX_ATTEMPTS,
