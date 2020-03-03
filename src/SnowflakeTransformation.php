@@ -59,7 +59,7 @@ class SnowflakeTransformation
     {
         foreach ($steps as $step) {
             foreach ($step['blocks'] as $block) {
-                $this->logger->info(sprintf('Start process block "%s"', $block['name']));
+                $this->logger->info(sprintf('Processing block "%s".', $block['name']));
                 $this->executionQueries($block['name'], $block['script']);
             }
         }
@@ -68,7 +68,7 @@ class SnowflakeTransformation
     public function executionQueries(string $name, array $queries): void
     {
         foreach ($queries as $query) {
-            $this->logger->info(sprintf('Run query: %s', $query));
+            $this->logger->info(sprintf('Running query "%s".', $query));
             $this->runRetryableQuery($query, $name);
         }
     }
@@ -98,7 +98,12 @@ class SnowflakeTransformation
                 }
             });
         } catch (\Throwable $exception) {
-            $message = sprintf('[%s] Query failed: "%s"', $errorMessage, $query);
+            $message = sprintf(
+                'Query "%s" in "%s" failed with error: "%s"',
+                $query,
+                $errorMessage,
+                $exception->getMessage()
+            );
             throw new UserException($message, 0, $exception);
         }
     }
