@@ -76,19 +76,6 @@ class SnowflakeTransformation
     private function createConnection(): Connection
     {
         $connection = new Connection($this->databaseConfig);
-        try {
-            if (!empty($this->databaseConfig['schema'])) {
-                $connection->query(
-                    sprintf(
-                        'USE SCHEMA %s',
-                        QueryBuilder::quoteIdentifier($this->databaseConfig['schema'])
-                    )
-                );
-            }
-        } catch (CannotAccessObjectException $e) {
-            throw new UserException($e->getMessage(), 0, $e);
-        }
-
         return $connection;
     }
 
