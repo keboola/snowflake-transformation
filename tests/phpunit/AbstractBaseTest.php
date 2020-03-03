@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeTransformation\Tests;
 
-use Keboola\Csv\CsvFile;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
-use Keboola\StorageApi\Client;
-use Keboola\StorageApi\Options\FileUploadOptions;
-use Keboola\StorageApi\Options\GetFileOptions;
+use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
@@ -36,13 +33,13 @@ abstract class AbstractBaseTest extends TestCase
     protected function getDatabaseConfig(): array
     {
         return [
-            'host' => getenv('SNOWFLAKE_HOST'),
-            'port' => getenv('SNOWFLAKE_PORT'),
-            'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
-            'database' => getenv('SNOWFLAKE_DATABASE'),
-            'schema' => getenv('SNOWFLAKE_SCHEMA'),
-            'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'host' => $this->getEnv('SNOWFLAKE_HOST'),
+            'port' => $this->getEnv('SNOWFLAKE_PORT'),
+            'warehouse' => $this->getEnv('SNOWFLAKE_WAREHOUSE'),
+            'database' => $this->getEnv('SNOWFLAKE_DATABASE'),
+            'schema' => $this->getEnv('SNOWFLAKE_SCHEMA'),
+            'user' => $this->getEnv('SNOWFLAKE_USER'),
+            'password' => $this->getEnv('SNOWFLAKE_PASSWORD'),
         ];
     }
 
@@ -61,7 +58,16 @@ abstract class AbstractBaseTest extends TestCase
         return $process;
     }
 
-    private function getConnection(array $databaseConfig): Connection
+    private function getEnv(string $envName): string
+    {
+        $envValue = getenv($envName);
+        if (!$envValue) {
+            throw new ApplicationException(sprintf('Missing environment "%s".', $envName));
+        }
+        return $envValue;
+    }
+
+    protected function getConnection(array $databaseConfig): Connection
     {
         return new Connection($databaseConfig);
     }
