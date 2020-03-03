@@ -25,8 +25,8 @@ class SnowflakeTransformationTest extends AbstractBaseTest
                                 'name' => 'first block',
                                 'script' => [
                                     'DROP TABLE IF EXISTS "output"',
-                                    'CREATE TABLE IF NOT EXISTS "output" ("usergender" VARCHAR(200),"usercity" VARCHAR(200),"usersentiment" VARCHAR(200),"zipcode" VARCHAR(200),"sku" VARCHAR(200),"createdat" VARCHAR(200),"category" VARCHAR(200),"price" VARCHAR(200),"county" VARCHAR(200),"countycode" VARCHAR(200),"userstate" VARCHAR(200),"categorygroup" VARCHAR(200));',
-                                    'INSERT INTO "output" SELECT "s"."usergender","s"."usercity","s"."usersentiment","s"."zipcode","s"."sku","s"."createdat","s"."category","s"."price","s"."county","s"."countycode","s"."userstate","c"."name" FROM "sales" AS "s" LEFT JOIN "categories" AS "c" ON "s"."categorygroupcode" = "c"."code"',
+                                    'CREATE TABLE IF NOT EXISTS "output" ("name" VARCHAR(200),"usercity" VARCHAR(200));',
+                                    "INSERT INTO \"output\" VALUES ('ondra', 'liberec'), ('odin', 'brno'), ('najlos', 'liberec')",
                                 ],
                             ],
                         ],
@@ -68,7 +68,8 @@ class SnowflakeTransformationTest extends AbstractBaseTest
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger, $this->dataDir);
 
         $this->expectException(UserException::class);
-        $this->expectExceptionMessage('[first block] Query failed: "test invalid query"');
+        $this->expectExceptionMessage('Query "test invalid query" in "first block" failed with error: "Error "odbc_prepare(): SQL error: SQL compilation error:
+syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPrepare" while executing query "test invalid query""');
         $snowflakeTransformation->execute();
     }
 }
