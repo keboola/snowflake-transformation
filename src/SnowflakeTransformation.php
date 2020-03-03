@@ -6,8 +6,6 @@ namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\UserException;
 use Keboola\SnowflakeDbAdapter\Connection;
-use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
-use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\SnowflakeTransformation\Exception\DeadConnectionException;
 use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
@@ -16,14 +14,11 @@ use Retry\RetryProxy;
 
 class SnowflakeTransformation
 {
-    /** @var Connection $connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var LoggerInterface $logger */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var array $databaseConfig */
-    private $databaseConfig;
+    private array $databaseConfig;
 
     public function __construct(Config $config, LoggerInterface $logger)
     {
