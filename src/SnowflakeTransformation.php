@@ -58,16 +58,9 @@ class SnowflakeTransformation
     public function processSteps(array $steps): void
     {
         foreach ($steps as $step) {
-            if ($step['execution'] === 'parallel') {
-                foreach ($step['blocks'] as $block) {
-                    $this->logger->info(sprintf('Start process block "%s"', $block['name']));
-                    $this->executionQueries($block['name'], $block['script']);
-                }
-            } else {
-                foreach ($step['blocks'] as $block) {
-                    $this->logger->info(sprintf('Start process block "%s"', $block['name']));
-                    $this->executionQueries($block['name'], $block['script']);
-                }
+            foreach ($step['blocks'] as $block) {
+                $this->logger->info(sprintf('Start process block "%s"', $block['name']));
+                $this->executionQueries($block['name'], $block['script']);
             }
         }
     }

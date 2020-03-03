@@ -20,7 +20,6 @@ class SnowflakeTransformationTest extends AbstractBaseTest
                 'steps' => [
                     [
                         'name' => 'first step',
-                        'execution' => 'serial',
                         'blocks' => [
                             [
                                 'name' => 'first block',
@@ -51,7 +50,6 @@ class SnowflakeTransformationTest extends AbstractBaseTest
                 'steps' => [
                     [
                         'name' => 'first step',
-                        'execution' => 'serial',
                         'blocks' => [
                             [
                                 'name' => 'first block',

@@ -61,7 +61,6 @@ class ConfigTest extends TestCase
                 'steps' => [
                     [
                         'name' => 'first step',
-                        'execution' => 'serial',
                     ],
                 ],
             ],
@@ -81,7 +80,6 @@ class ConfigTest extends TestCase
                 'steps' => [
                     [
                         'name' => 'first step',
-                        'execution' => 'serial',
                         'blocks' => [
                             [
                                 'name' => 'first block',
@@ -94,37 +92,6 @@ class ConfigTest extends TestCase
 
         $configDefinition = new ConfigDefinition();
         $expectedMessage = 'The child node "script" at path "root.parameters.steps.0.blocks.0" must be configured.';
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
-        new Config($configArray, $configDefinition);
-    }
-
-    public function testInvalidExecutionType(): void
-    {
-        $configArray = [
-            'authorization' => $this->getDatabaseConfig(),
-            'parameters' => [
-                'steps' => [
-                    [
-                        'name' => 'first step',
-                        'execution' => 'invalidType',
-                        'blocks' => [
-                            [
-                                'name' => 'first block',
-                                'script' => [
-                                    'DROP TABLE IF EXISTS "output"',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $configDefinition = new ConfigDefinition();
-        $expectedMessage =
-            'The value "invalidType" is not allowed for path "root.parameters.steps.0.execution". ' .
-            'Permissible values: "parallel", "serial"';
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
         new Config($configArray, $configDefinition);
