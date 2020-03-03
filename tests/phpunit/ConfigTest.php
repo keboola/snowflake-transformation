@@ -19,7 +19,6 @@ class ConfigTest extends TestCase
                 'steps' => [
                     [
                         'name' => 'first step',
-                        'execution' => 'serial',
                         'blocks' => [
                             [
                                 'name' => 'first block',
