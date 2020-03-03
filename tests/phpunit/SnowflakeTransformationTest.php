@@ -96,6 +96,37 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         $snowflakeTransformation->execute();
     }
 
+    public function testQueryTimeoutSessionOverride()
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'query_timeout' => 5,
+                'steps' => [
+                    [
+                        'name' => 'first step',
+                        'blocks' => [
+                            [
+                                'name' => 'first block',
+                                'script' => [
+                                    'CALL SYSTEM$WAIT(10);'
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->putConfig($config, $this->dataDir);
+        $logger = new Logger();
+        $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
+
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Query "CALL SYSTEM$WAIT(10);" in "first block" failed with error: "Query reached its timeout 5 second(s)"');
+        $snowflakeTransformation->execute();
+    }
+
     public function testMissingAuthorization(): void
     {
         $config = [
@@ -107,7 +138,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
                             [
                                 'name' => 'first block',
                                 'script' => [
-                                    'test invalid query',
+                                    'select 1',
                                 ],
                             ],
                         ],

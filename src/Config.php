@@ -9,13 +9,9 @@ use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 
 class Config extends BaseConfig
 {
-    public function getQueryTimeout(): ?int
+    public function getQueryTimeout(): int
     {
-        try {
-            return (int) $this->getValue(['queryTimeout']);
-        } catch (\InvalidArgumentException $e) {
-            return null;
-        }
+        return (int) $this->getValue(['parameters', 'query_timeout']);
     }
 
     public function getSteps(): array
