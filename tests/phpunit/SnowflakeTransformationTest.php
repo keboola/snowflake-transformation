@@ -6,6 +6,7 @@ namespace Keboola\SnowflakeTransformation\Tests;
 
 use Keboola\Component\Logger;
 use Keboola\Component\UserException;
+use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\SnowflakeTransformation\SnowflakeTransformationComponent;
 
 class SnowflakeTransformationTest extends AbstractBaseTest
@@ -40,6 +41,24 @@ class SnowflakeTransformationTest extends AbstractBaseTest
 
         $this->assertEquals(0, $process->getExitCode(), $process->getErrorOutput());
         $this->assertEmpty($process->getErrorOutput(), $process->getErrorOutput());
+
+        $insertedData = $this->getConnection($this->getDatabaseConfig())->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('output'))
+        );
+        $this->assertEquals($insertedData, [
+            [
+                'name' => 'ondra',
+                'usercity' => 'liberec',
+            ],
+            [
+                'name' => 'odin',
+                'usercity' => 'brno',
+            ],
+            [
+                'name' => 'najlos',
+                'usercity' => 'liberec',
+            ],
+        ]);
     }
 
     public function testQueryFailed(): void
