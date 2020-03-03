@@ -67,9 +67,11 @@ class SnowflakeTransformationTest extends AbstractBaseTest
         $logger = new Logger();
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger, $this->dataDir);
 
+        // phpcs:disable Generic.Files.LineLength
+        $expectMessage = 'Query "test invalid query" in "first block" failed with error: "Error "odbc_prepare(): SQL error: SQL compilation error: syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPrepare" while executing query "test invalid query""';
+        // phpcs:enable
         $this->expectException(UserException::class);
-        $this->expectExceptionMessage('Query "test invalid query" in "first block" failed with error: "Error "odbc_prepare(): SQL error: SQL compilation error:
-syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPrepare" while executing query "test invalid query""');
+        $this->expectExceptionMessage($expectMessage);
         $snowflakeTransformation->execute();
     }
 }
