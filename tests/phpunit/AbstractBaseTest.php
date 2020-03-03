@@ -16,28 +16,30 @@ abstract class AbstractBaseTest extends TestCase
 {
     protected string $dataDir = __DIR__ . '/../../data';
 
-    private Connection $connection;
+    protected Connection $connection;
 
     public function setUp(): void
     {
         $databaseConfig = $this->getDatabaseConfig();
-        $this->connection = $this->getConnection($databaseConfig);
+        $this->connection = $this->getConnection($databaseConfig['workspace']);
 
         $this->connection->query(
-            sprintf('USE SCHEMA %s', QueryBuilder::quoteIdentifier($databaseConfig['schema']))
+            sprintf('USE SCHEMA %s', QueryBuilder::quoteIdentifier($databaseConfig['workspace']['schema']))
         );
     }
 
     protected function getDatabaseConfig(): array
     {
         return [
-            'host' => $this->getEnv('SNOWFLAKE_HOST'),
-            'port' => $this->getEnv('SNOWFLAKE_PORT'),
-            'warehouse' => $this->getEnv('SNOWFLAKE_WAREHOUSE'),
-            'database' => $this->getEnv('SNOWFLAKE_DATABASE'),
-            'schema' => $this->getEnv('SNOWFLAKE_SCHEMA'),
-            'user' => $this->getEnv('SNOWFLAKE_USER'),
-            'password' => $this->getEnv('SNOWFLAKE_PASSWORD'),
+            'workspace' => [
+                'host' => $this->getEnv('SNOWFLAKE_HOST'),
+                'port' => $this->getEnv('SNOWFLAKE_PORT'),
+                'warehouse' => $this->getEnv('SNOWFLAKE_WAREHOUSE'),
+                'database' => $this->getEnv('SNOWFLAKE_DATABASE'),
+                'schema' => $this->getEnv('SNOWFLAKE_SCHEMA'),
+                'user' => $this->getEnv('SNOWFLAKE_USER'),
+                'password' => $this->getEnv('SNOWFLAKE_PASSWORD'),
+            ],
         ];
     }
 

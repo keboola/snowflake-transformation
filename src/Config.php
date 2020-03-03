@@ -24,6 +24,6 @@ class Config extends BaseConfig
 
     public function getDatabaseConfig(): array
     {
-        return $this->getValue(['authorization']);
+        return $this->getValue(['authorization', 'workspace']);
     }
 }

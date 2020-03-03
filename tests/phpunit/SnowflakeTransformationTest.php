@@ -42,7 +42,7 @@ class SnowflakeTransformationTest extends AbstractBaseTest
         $this->assertEquals(0, $process->getExitCode(), $process->getErrorOutput());
         $this->assertEmpty($process->getErrorOutput(), $process->getErrorOutput());
 
-        $insertedData = $this->getConnection($this->getDatabaseConfig())->fetchAll(
+        $insertedData = $this->connection->fetchAll(
             sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('output'))
         );
         $this->assertEquals($insertedData, [

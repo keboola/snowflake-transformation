@@ -99,13 +99,15 @@ class ConfigTest extends TestCase
     private function getDatabaseConfig(): array
     {
         return [
-            'host' => 'xxx',
-            'port' => 'xxx',
-            'warehouse' => 'xxx',
-            'database' => 'xxx',
-            'schema' => 'xxx',
-            'user' => 'xxx',
-            'password' => 'xxx',
+            'workspace' => [
+                'host' => 'xxx',
+                'port' => 'xxx',
+                'warehouse' => 'xxx',
+                'database' => 'xxx',
+                'schema' => 'xxx',
+                'user' => 'xxx',
+                'password' => 'xxx',
+            ],
         ];
     }
 }
