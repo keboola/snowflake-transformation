@@ -111,7 +111,7 @@ class SnowflakeTransformation
     private function tryReconnect(): void
     {
         try {
-            $this->isAlive();
+            $this->testConnection();
         } catch (DeadConnectionException $deadConnectionException) {
             $this->connection = $this->createConnection();
         }
@@ -119,13 +119,8 @@ class SnowflakeTransformation
 
     private function testConnection(): void
     {
-        $this->connection->query('SELECT 1;');
-    }
-
-    protected function isAlive(): void
-    {
         try {
-            $this->testConnection();
+            $this->connection->query('SELECT 1;');
         } catch (\Throwable $e) {
             throw new DeadConnectionException('Dead connection: ' . $e->getMessage());
         }
