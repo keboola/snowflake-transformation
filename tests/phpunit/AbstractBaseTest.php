@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 abstract class AbstractBaseTest extends TestCase
 {
     /** @var string $dataDir */
-    protected $dataDir = __DIR__ . '/../data';
+    protected $dataDir = __DIR__ . '/../../data';
 
     /** @var Connection $connection */
     private $connection;

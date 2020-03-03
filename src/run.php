@@ -10,10 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $logger = new Logger();
 try {
-    $arguments = getopt('d::', ['data::']);
-    $dataDir = isset($arguments['data']) && is_string($arguments['data']) ? (string) $arguments['data'] : null;
-
-    $app = new SnowflakeTransformationComponent($logger, $dataDir);
+    $app = new SnowflakeTransformationComponent($logger);
     $app->execute();
     exit(0);
 } catch (UserException $e) {

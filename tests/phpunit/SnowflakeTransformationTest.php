@@ -84,7 +84,7 @@ class SnowflakeTransformationTest extends AbstractBaseTest
 
         $this->putConfig($config, $this->dataDir);
         $logger = new Logger();
-        $snowflakeTransformation = new SnowflakeTransformationComponent($logger, $this->dataDir);
+        $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
 
         // phpcs:disable Generic.Files.LineLength
         $expectMessage = 'Query "test invalid query" in "first block" failed with error: "Error "odbc_prepare(): SQL error: SQL compilation error:
