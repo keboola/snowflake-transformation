@@ -66,7 +66,7 @@ abstract class AbstractBaseTest extends TestCase
     protected function runProcess(array $config): Process
     {
         $this->putConfig($config, $this->dataDir);
-        $process = new Process(['php', '/code/src/run.php', '--data=' . $this->dataDir]);
+        $process = new Process(['php', __DIR__ . '/../../src/run.php', '--data=' . $this->dataDir]);
         $process->run();
         return $process;
     }
