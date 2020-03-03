@@ -52,7 +52,7 @@ class SnowflakeTransformation
         });
 
         $query = sprintf('ALTER SESSION SET %s;', implode(',', $sessionVariables));
-        $this->runRetriableQuery($query, 'alter session');
+        $this->runRetryableQuery($query, 'alter session');
     }
 
     public function processSteps(array $steps): void
@@ -69,7 +69,7 @@ class SnowflakeTransformation
     {
         foreach ($queries as $query) {
             $this->logger->info(sprintf('Run query: %s', $query));
-            $this->runRetriableQuery($query, $name);
+            $this->runRetryableQuery($query, $name);
         }
     }
 
