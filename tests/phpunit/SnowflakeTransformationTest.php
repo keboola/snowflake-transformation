@@ -7,6 +7,7 @@ namespace Keboola\SnowflakeTransformation\Tests;
 use Keboola\Component\Logger;
 use Keboola\Component\UserException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
+use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 use Keboola\SnowflakeTransformation\SnowflakeTransformationComponent;
 
 class SnowflakeTransformationTest extends AbstractBaseTest
@@ -92,6 +93,35 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         // phpcs:enable
         $this->expectException(UserException::class);
         $this->expectExceptionMessage($expectMessage);
+        $snowflakeTransformation->execute();
+    }
+
+    public function testMissingAuthorization(): void
+    {
+        $config = [
+            'parameters' => [
+                'steps' => [
+                    [
+                        'name' => 'first step',
+                        'blocks' => [
+                            [
+                                'name' => 'first block',
+                                'script' => [
+                                    'test invalid query',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->putConfig($config, $this->dataDir);
+        $logger = new Logger();
+        $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
+
+        $this->expectException(ApplicationException::class);
+        $this->expectExceptionMessage('Missing authorization for workspace');
         $snowflakeTransformation->execute();
     }
 }

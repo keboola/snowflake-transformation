@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\Config\BaseConfig;
+use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 
 class Config extends BaseConfig
 {
@@ -24,6 +25,10 @@ class Config extends BaseConfig
 
     public function getDatabaseConfig(): array
     {
-        return $this->getValue(['authorization', 'workspace']);
+        try {
+            return $this->getValue(['authorization', 'workspace']);
+        } catch (\InvalidArgumentException $exception) {
+            throw new ApplicationException('Missing authorization for workspace');
+        }
     }
 }
