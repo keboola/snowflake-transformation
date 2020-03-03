@@ -95,7 +95,7 @@ class SnowflakeTransformation
         } catch (\Throwable $exception) {
             $message = sprintf(
                 'Query "%s" in "%s" failed with error: "%s"',
-                $query,
+                $this->queryExcerpt($query),
                 $errorMessage,
                 $exception->getMessage()
             );
@@ -119,5 +119,13 @@ class SnowflakeTransformation
         } catch (\Throwable $e) {
             throw new DeadConnectionException('Dead connection: ' . $e->getMessage());
         }
+    }
+
+    private function queryExcerpt(string $query): string
+    {
+        if (strlen($query) > 1000) {
+            return mb_substr($query, 0, 500, "UTF-8") . "\n...\n" . mb_substr($query, -500, null, "UTF-8");
+        }
+        return $query;
     }
 }
