@@ -127,6 +127,43 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         $snowflakeTransformation->execute();
     }
 
+    public function testQueryTagging(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'steps' => [
+                    [
+                        'name' => 'first step',
+                        'blocks' => [
+                            [
+                                'name' => 'first block',
+                                'script' => [
+                                    'drop table if exists "query_tag";',
+                                    'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));',
+                                    'insert into "query_tag" SELECT QUERY_TEXT, QUERY_TAG FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION()) WHERE QUERY_TEXT = \'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));\' ORDER BY START_TIME DESC LIMIT 1;'
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->putConfig($config, $this->dataDir);
+        $logger = new Logger();
+        $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
+        $snowflakeTransformation->execute();
+
+        $insertedData = $this->getConnection($this->getDatabaseConfig()['workspace'])->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('query_tag'))
+        );
+
+        $this->assertNotEmpty($insertedData);
+        $expectedData = sprintf('{"runId":"%s"}', $this->getEnv('KBC_RUNID'));
+        $this->assertEquals($expectedData, $insertedData[0]['QUERY_TAG']);
+    }
+
     public function testMissingAuthorization(): void
     {
         $config = [

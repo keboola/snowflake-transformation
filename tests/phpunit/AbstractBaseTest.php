@@ -58,7 +58,7 @@ abstract class AbstractBaseTest extends TestCase
         return $process;
     }
 
-    private function getEnv(string $envName): string
+    protected function getEnv(string $envName): string
     {
         $envValue = getenv($envName);
         if (!$envValue) {
