@@ -97,6 +97,35 @@ class ConfigTest extends TestCase
         new Config($configArray, $configDefinition);
     }
 
+    public function testInvalidQueryTimeout(): void
+    {
+        $configArray = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'query_timeout' => 'asd',
+                'steps' => [
+                    [
+                        'name' => 'first step',
+                        'blocks' => [
+                            [
+                                'name' => 'first block',
+                                'script' => [
+                                    'test invalid query',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $configDefinition = new ConfigDefinition();
+        $expectedMessage = 'Invalid type for path "root.parameters.query_timeout". Expected int, but got string.';
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        new Config($configArray, $configDefinition);
+    }
+
     private function getDatabaseConfig(): array
     {
         return [
