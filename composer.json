@@ -5,6 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.4",
+        "keboola/common-exceptions": "^1.0",
         "keboola/db-adapter-snowflake": "1.0.4",
         "keboola/php-component": "^7.0.1",
         "keboola/php-temp": "^2.0",

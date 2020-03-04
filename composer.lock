@@ -4,8 +4,45 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac01617bb620153fd591c26d99ea80f3",
+    "content-hash": "b5939fba72f870b4c8289dd001b7d070",
     "packages": [
+        {
+            "name": "keboola/common-exceptions",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/common-exceptions.git",
+                "reference": "44bff6e6d1f8edfb81af7662bc231566dcecb241"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/common-exceptions/zipball/44bff6e6d1f8edfb81af7662bc231566dcecb241",
+                "reference": "44bff6e6d1f8edfb81af7662bc231566dcecb241",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "jakub-onderka/php-parallel-lint": "^1.0",
+                "keboola/coding-standard": ">=7.0.2",
+                "keboola/php-temp": "^1.0",
+                "phpstan/phpstan-shim": "^0.10.6",
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Keboola\\CommonExceptions\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Common exceptions shared between different applications",
+            "time": "2019-11-21T11:09:10+00:00"
+        },
         {
             "name": "keboola/db-adapter-snowflake",
             "version": "1.0.4",
