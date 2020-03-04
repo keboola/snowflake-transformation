@@ -96,7 +96,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         $snowflakeTransformation->execute();
     }
 
-    public function testQueryTimeoutSessionOverride()
+    public function testQueryTimeoutSessionOverride(): void
     {
         $config = [
             'authorization' => $this->getDatabaseConfig(),
@@ -109,7 +109,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
                             [
                                 'name' => 'first block',
                                 'script' => [
-                                    'CALL SYSTEM$WAIT(10);'
+                                    'CALL SYSTEM$WAIT(10);',
                                 ],
                             ],
                         ],
@@ -123,12 +123,15 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
 
         $this->expectException(UserException::class);
-        $this->expectExceptionMessage('Query "CALL SYSTEM$WAIT(10);" in "first block" failed with error: "Query reached its timeout 5 second(s)"');
+        $expectedMessage = 'Query "CALL SYSTEM$WAIT(10);" in "first block" failed with error: ' .
+            '"Query reached its timeout 5 second(s)"';
+        $this->expectExceptionMessage($expectedMessage);
         $snowflakeTransformation->execute();
     }
 
     public function testQueryTagging(): void
     {
+        // phpcs:disable Generic.Files.LineLength
         $config = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
@@ -141,7 +144,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
                                 'script' => [
                                     'drop table if exists "query_tag";',
                                     'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));',
-                                    'insert into "query_tag" SELECT QUERY_TEXT, QUERY_TAG FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION()) WHERE QUERY_TEXT = \'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));\' ORDER BY START_TIME DESC LIMIT 1;'
+                                    'insert into "query_tag" SELECT QUERY_TEXT, QUERY_TAG FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION()) WHERE QUERY_TEXT = \'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));\' ORDER BY START_TIME DESC LIMIT 1;',
                                 ],
                             ],
                         ],
@@ -149,6 +152,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
                 ],
             ],
         ];
+        // phpcs:enable
 
         $this->putConfig($config);
 
