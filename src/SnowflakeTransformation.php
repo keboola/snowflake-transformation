@@ -85,12 +85,7 @@ class SnowflakeTransformation
 
         try {
             $retryProxy->call(function () use ($query): void {
-                try {
-                    $this->connection->query($query);
-                } catch (\Throwable $exception) {
-                    $this->tryReconnect();
-                    throw $exception;
-                }
+                $this->connection->query($query);
             });
         } catch (\Throwable $exception) {
             $message = sprintf(
@@ -100,24 +95,6 @@ class SnowflakeTransformation
                 $exception->getMessage()
             );
             throw new UserException($message, 0, $exception);
-        }
-    }
-
-    private function tryReconnect(): void
-    {
-        try {
-            $this->testConnection();
-        } catch (DeadConnectionException $deadConnectionException) {
-            $this->connection = $this->createConnection();
-        }
-    }
-
-    private function testConnection(): void
-    {
-        try {
-            $this->connection->query('SELECT 1;');
-        } catch (\Throwable $e) {
-            throw new DeadConnectionException('Dead connection: ' . $e->getMessage());
         }
     }
 
