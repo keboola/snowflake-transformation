@@ -96,6 +96,40 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         $snowflakeTransformation->execute();
     }
 
+    public function testEmptyQuery(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'steps' => [
+                    [
+                        'name' => 'first step',
+                        'blocks' => [
+                            [
+                                'name' => 'first block',
+                                'script' => [
+                                    '',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->putConfig($config);
+        $logger = new Logger();
+        $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
+        try {
+            $snowflakeTransformation->execute();
+            $this->fail('Not allowed proccessing empty sql query');
+        } catch (UserException $exception) {
+            $expectedMessage = 'Query "" in "first block" failed with error: '.
+                '"odbc_prepare(): SQL error: [Snowflake][Snowflake] (4)';
+            $this->assertStringContainsString($expectedMessage, $exception->getMessage());
+        }
+    }
+
     public function testQueryTimeoutSessionOverride(): void
     {
         $config = [
