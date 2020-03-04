@@ -83,7 +83,7 @@ class SnowflakeTransformationTest extends AbstractBaseTest
             ],
         ];
 
-        $this->putConfig($config, $this->dataDir);
+        $this->putConfig($config);
         $logger = new Logger();
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
 
@@ -118,7 +118,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
             ],
         ];
 
-        $this->putConfig($config, $this->dataDir);
+        $this->putConfig($config);
         $logger = new Logger();
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
 
@@ -150,7 +150,8 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
             ],
         ];
 
-        $this->putConfig($config, $this->dataDir);
+        $this->putConfig($config);
+
         $logger = new Logger();
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
         $snowflakeTransformation->execute();
@@ -184,7 +185,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
             ],
         ];
 
-        $this->putConfig($config, $this->dataDir);
+        $this->putConfig($config);
         $logger = new Logger();
         $snowflakeTransformation = new SnowflakeTransformationComponent($logger);
 

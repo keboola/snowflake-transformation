@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeTransformation\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
-use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -22,10 +21,6 @@ abstract class AbstractBaseTest extends TestCase
     {
         $databaseConfig = $this->getDatabaseConfig();
         $this->connection = $this->getConnection($databaseConfig['workspace']);
-
-        $this->connection->query(
-            sprintf('USE SCHEMA %s', QueryBuilder::quoteIdentifier($databaseConfig['workspace']['schema']))
-        );
     }
 
     protected function getDatabaseConfig(): array
@@ -43,17 +38,17 @@ abstract class AbstractBaseTest extends TestCase
         ];
     }
 
-    protected function putConfig(array $config, string $dataDir): void
+    protected function putConfig(array $config): void
     {
         $jsonEncode = new JsonEncode();
         $json = $jsonEncode->encode($config, JsonEncoder::FORMAT);
-        file_put_contents($dataDir . '/config.json', $json);
+        file_put_contents($this->dataDir . '/config.json', $json);
     }
 
     protected function runProcess(array $config): Process
     {
-        $this->putConfig($config, $this->dataDir);
-        $process = new Process(['php', __DIR__ . '/../../src/run.php', '--data=' . $this->dataDir]);
+        $this->putConfig($config);
+        $process = new Process(['php', __DIR__ . '/../../src/run.php']);
         $process->run();
         return $process;
     }
