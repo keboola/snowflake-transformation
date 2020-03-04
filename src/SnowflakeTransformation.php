@@ -6,7 +6,6 @@ namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\UserException;
 use Keboola\SnowflakeDbAdapter\Connection;
-use Keboola\SnowflakeTransformation\Exception\DeadConnectionException;
 use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
@@ -31,10 +30,7 @@ class SnowflakeTransformation
     {
         $sessionVariables = [];
         $sessionVariables['QUERY_TAG'] = sprintf("'%s'", json_encode(['runId' => getenv('KBC_RUNID')]));
-
-        if ($config->getQueryTimeout()) {
-            $sessionVariables['STATEMENT_TIMEOUT_IN_SECONDS'] = $config->getQueryTimeout();
-        }
+        $sessionVariables['STATEMENT_TIMEOUT_IN_SECONDS'] = $config->getQueryTimeout();
 
         array_walk($sessionVariables, function (&$item, $key): void {
             $item = vsprintf(
