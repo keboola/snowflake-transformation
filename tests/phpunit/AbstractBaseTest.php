@@ -27,13 +27,13 @@ abstract class AbstractBaseTest extends TestCase
     {
         return [
             'workspace' => [
-                'host' => $this->getEnv('SNOWFLAKE_HOST'),
-                'port' => $this->getEnv('SNOWFLAKE_PORT'),
-                'warehouse' => $this->getEnv('SNOWFLAKE_WAREHOUSE'),
-                'database' => $this->getEnv('SNOWFLAKE_DATABASE'),
-                'schema' => $this->getEnv('SNOWFLAKE_SCHEMA'),
-                'user' => $this->getEnv('SNOWFLAKE_USER'),
-                'password' => $this->getEnv('SNOWFLAKE_PASSWORD'),
+                'host' => getenv('SNOWFLAKE_HOST'),
+                'port' => getenv('SNOWFLAKE_PORT'),
+                'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
+                'database' => getenv('SNOWFLAKE_DATABASE'),
+                'schema' => getenv('SNOWFLAKE_SCHEMA'),
+                'user' => getenv('SNOWFLAKE_USER'),
+                'password' => getenv('SNOWFLAKE_PASSWORD'),
             ],
         ];
     }
@@ -51,15 +51,6 @@ abstract class AbstractBaseTest extends TestCase
         $process = new Process(['php', __DIR__ . '/../../src/run.php']);
         $process->run();
         return $process;
-    }
-
-    protected function getEnv(string $envName): string
-    {
-        $envValue = getenv($envName);
-        if (!$envValue) {
-            throw new ApplicationException(sprintf('Missing environment "%s".', $envName));
-        }
-        return $envValue;
     }
 
     protected function getConnection(array $databaseConfig): Connection

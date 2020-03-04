@@ -199,7 +199,7 @@ syntax error line 1 at position 0 unexpected \'test\'., SQL state 37000 in SQLPr
         );
 
         $this->assertNotEmpty($insertedData);
-        $expectedData = sprintf('{"runId":"%s"}', $this->getEnv('KBC_RUNID'));
+        $expectedData = sprintf('{"runId":"%s"}', getenv('KBC_RUNID'));
         $this->assertEquals($expectedData, $insertedData[0]['QUERY_TAG']);
     }
 
