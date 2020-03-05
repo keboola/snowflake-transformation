@@ -14,7 +14,7 @@ $environments = [
     'SNOWFLAKE_SCHEMA',
     'SNOWFLAKE_USER',
     'SNOWFLAKE_PASSWORD',
-    'KBC_RUNID'
+    'KBC_RUNID',
 ];
 
 foreach ($environments as $environment) {
