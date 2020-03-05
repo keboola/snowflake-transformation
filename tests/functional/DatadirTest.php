@@ -143,10 +143,11 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ];
 
-        $this->runAppWithConfig(
+        $process = $this->runAppWithConfig(
             $config,
             2
         );
+        $this->assertStringContainsString('Missing authorization for workspace', $process->getErrorOutput());
     }
 
     public function testQueryTagging(): void
