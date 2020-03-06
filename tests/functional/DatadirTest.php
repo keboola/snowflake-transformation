@@ -194,6 +194,34 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertEquals($expectedData, $insertedData[0]['QUERY_TAG']);
     }
 
+    public function testAbortTransformation(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'steps' => [
+                    [
+                        'name' => 'first step',
+                        'blocks' => [
+                            [
+                                'name' => 'first block',
+                                'script' => [
+                                    'SET ABORT_TRANSFORMATION=\'Abort Me Please\'',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->runAppWithConfig(
+            $config,
+            1,
+            null,
+            "Transformation aborted with message \"Abort Me Please\"\n"
+        );
+    }
     private function runAppWithConfig(
         array $config,
         int $expectedReturnCode = 0,

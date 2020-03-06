@@ -86,6 +86,23 @@ class SnowflakeTransformation
                 );
                 throw new UserException($message, 0, $exception);
             }
+
+            $this->checkUserTermination();
+        }
+    }
+
+    protected function checkUserTermination(): void
+    {
+        $result = $this->connection->fetchAll("SHOW VARIABLES LIKE 'ABORT_TRANSFORMATION'");
+
+        if (count($result) === 0) {
+            return;
+        }
+
+        if ($result[0]['value'] !== '') {
+            throw new UserException(
+                sprintf('Transformation aborted with message "%s"', $result[0]['value'])
+            );
         }
     }
 
