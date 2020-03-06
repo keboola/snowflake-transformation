@@ -22,12 +22,12 @@ class DatadirTest extends AbstractDatadirTestCase
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'DROP TABLE IF EXISTS "output"',
                                     'CREATE TABLE IF NOT EXISTS "output" ("name" VARCHAR(200),"usercity" VARCHAR(200));',
@@ -68,12 +68,12 @@ class DatadirTest extends AbstractDatadirTestCase
         $config = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'test invalid query',
                                 ],
@@ -85,7 +85,7 @@ class DatadirTest extends AbstractDatadirTestCase
         ];
 
         // phpcs:disable Generic.Files.LineLength
-        $expectedMessage = "Query \"test invalid query\" in \"first block\" failed with error: \"Error \"odbc_prepare(): SQL error: SQL compilation error: syntax error line 1 at position 0 unexpected 'test'., SQL state 37000 in SQLPrepare\" while executing query \"test invalid query\"\"\n";
+        $expectedMessage = "Query \"test invalid query\" in \"first code\" failed with error: \"Error \"odbc_prepare(): SQL error: SQL compilation error: syntax error line 1 at position 0 unexpected 'test'., SQL state 37000 in SQLPrepare\" while executing query \"test invalid query\"\"\n";
         // phpcs:enable
 
         $this->runAppWithConfig($config, 1, null, $expectedMessage);
@@ -97,12 +97,12 @@ class DatadirTest extends AbstractDatadirTestCase
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
                 'query_timeout' => 5,
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'CALL SYSTEM$WAIT(10);',
                                 ],
@@ -113,7 +113,7 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ];
 
-        $expectedMessage = 'Query "CALL SYSTEM$WAIT(10);" in "first block" failed with error: ' .
+        $expectedMessage = 'Query "CALL SYSTEM$WAIT(10);" in "first code" failed with error: ' .
             "\"Query reached its timeout 5 second(s)\"\n";
         $this->runAppWithConfig(
             $config,
@@ -127,12 +127,12 @@ class DatadirTest extends AbstractDatadirTestCase
     {
         $config = [
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'select 1',
                                 ],
@@ -160,12 +160,12 @@ class DatadirTest extends AbstractDatadirTestCase
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "query_tag";',
                                     $createTableQuery,
@@ -199,12 +199,12 @@ class DatadirTest extends AbstractDatadirTestCase
         $config = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'SET ABORT_TRANSFORMATION=\'Abort Me Please\'',
                                 ],

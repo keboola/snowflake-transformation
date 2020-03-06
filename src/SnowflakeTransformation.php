@@ -43,19 +43,19 @@ class SnowflakeTransformation
         $this->executionQueries('alter session', [$query]);
     }
 
-    public function processSteps(array $steps): void
-    {
-        foreach ($steps as $step) {
-            $this->logger->info(sprintf('Processing step "%s".', $step['name']));
-            $this->processBlocks($step['blocks']);
-        }
-    }
-
     public function processBlocks(array $blocks): void
     {
         foreach ($blocks as $block) {
             $this->logger->info(sprintf('Processing block "%s".', $block['name']));
-            $this->executionQueries($block['name'], $block['script']);
+            $this->processCodes($block['codes']);
+        }
+    }
+
+    public function processCodes(array $codes): void
+    {
+        foreach ($codes as $code) {
+            $this->logger->info(sprintf('Processing codes "%s".', $code['name']));
+            $this->executionQueries($code['name'], $code['script']);
         }
     }
 

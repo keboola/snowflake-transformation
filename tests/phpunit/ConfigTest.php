@@ -16,12 +16,12 @@ class ConfigTest extends TestCase
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'DROP TABLE IF EXISTS "output"',
                                 ],
@@ -40,7 +40,7 @@ class ConfigTest extends TestCase
         $this->assertEquals($configArray['authorization'], $config->getAuthorization());
     }
 
-    public function testMissingStep(): void
+    public function testMissingBlock(): void
     {
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
@@ -49,18 +49,18 @@ class ConfigTest extends TestCase
 
         $configDefinition = new ConfigDefinition();
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "steps" at path "root.parameters" must be configured.');
+        $this->expectExceptionMessage('The child node "blocks" at path "root.parameters" must be configured.');
         new Config($configArray, $configDefinition);
     }
 
-    public function testMissingBlock(): void
+    public function testMissingCode(): void
     {
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
+                        'name' => 'first block',
                     ],
                 ],
             ],
@@ -68,7 +68,7 @@ class ConfigTest extends TestCase
 
         $configDefinition = new ConfigDefinition();
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "blocks" at path "root.parameters.steps.0" must be configured.');
+        $this->expectExceptionMessage('The child node "codes" at path "root.parameters.blocks.0" must be configured.');
         new Config($configArray, $configDefinition);
     }
 
@@ -77,12 +77,12 @@ class ConfigTest extends TestCase
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                             ],
                         ],
                     ],
@@ -91,7 +91,7 @@ class ConfigTest extends TestCase
         ];
 
         $configDefinition = new ConfigDefinition();
-        $expectedMessage = 'The child node "script" at path "root.parameters.steps.0.blocks.0" must be configured.';
+        $expectedMessage = 'The child node "script" at path "root.parameters.blocks.0.codes.0" must be configured.';
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
         new Config($configArray, $configDefinition);
@@ -103,12 +103,12 @@ class ConfigTest extends TestCase
             'authorization' => $this->getDatabaseConfig(),
             'parameters' => [
                 'query_timeout' => 'asd',
-                'steps' => [
+                'blocks' => [
                     [
-                        'name' => 'first step',
-                        'blocks' => [
+                        'name' => 'first block',
+                        'codes' => [
                             [
-                                'name' => 'first block',
+                                'name' => 'first code',
                                 'script' => [
                                     'test invalid query',
                                 ],

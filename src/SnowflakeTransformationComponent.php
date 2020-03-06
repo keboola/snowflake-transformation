@@ -18,7 +18,7 @@ class SnowflakeTransformationComponent extends BaseComponent
 
         $snowflakeTransformation->setSession($config);
 
-        $snowflakeTransformation->processSteps($config->getSteps());
+        $snowflakeTransformation->processBlocks($config->getBlocks());
     }
 
     protected function getConfigClass(): string

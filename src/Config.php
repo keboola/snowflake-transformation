@@ -14,9 +14,9 @@ class Config extends BaseConfig
         return (int) $this->getValue(['parameters', 'query_timeout']);
     }
 
-    public function getSteps(): array
+    public function getBlocks(): array
     {
-        return $this->getValue(['parameters', 'steps']);
+        return $this->getValue(['parameters', 'blocks']);
     }
 
     public function getDatabaseConfig(): array
