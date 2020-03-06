@@ -70,7 +70,11 @@ class SnowflakeTransformation
             $uncommentedQuery = \SqlFormatter::removeComments($query);
 
             // Do not execute empty queries
-            if (strlen(trim($uncommentedQuery)) == 0) {
+            if (strlen(trim($uncommentedQuery)) === 0) {
+                continue;
+            }
+
+            if (strtoupper(substr($uncommentedQuery, 0, 6)) === 'SELECT') {
                 continue;
             }
 
