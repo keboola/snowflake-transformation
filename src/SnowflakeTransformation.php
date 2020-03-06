@@ -7,9 +7,6 @@ namespace Keboola\SnowflakeTransformation;
 use Keboola\Component\UserException;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Psr\Log\LoggerInterface;
-use Retry\BackOff\ExponentialBackOffPolicy;
-use Retry\Policy\SimpleRetryPolicy;
-use Retry\RetryProxy;
 
 class SnowflakeTransformation
 {
