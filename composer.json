@@ -13,7 +13,7 @@
         "php": "^7.4",
         "jdorn/sql-formatter": "dev-master",
         "keboola/common-exceptions": "^1.0",
-        "keboola/db-adapter-snowflake": "1.0.4",
+        "keboola/db-adapter-snowflake": "1.0.5",
         "keboola/php-component": "^8.0",
         "keboola/retry": "^0.5.0"
     },

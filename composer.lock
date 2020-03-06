@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de38c936ef9b8276ba588dbdb69c0630",
+    "content-hash": "a26b1e4813bd2037640cec675d552e4b",
     "packages": [
         {
             "name": "jdorn/sql-formatter",
@@ -100,16 +100,16 @@
         },
         {
             "name": "keboola/db-adapter-snowflake",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-adapter-snowflake.git",
-                "reference": "9045ffb57777cc4a29c58a0ddf1c2f7864cf3de2"
+                "reference": "e88c894a4bb4b75723cd7275a43760ec0f354a7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-adapter-snowflake/zipball/9045ffb57777cc4a29c58a0ddf1c2f7864cf3de2",
-                "reference": "9045ffb57777cc4a29c58a0ddf1c2f7864cf3de2",
+                "url": "https://api.github.com/repos/keboola/db-adapter-snowflake/zipball/e88c894a4bb4b75723cd7275a43760ec0f354a7c",
+                "reference": "e88c894a4bb4b75723cd7275a43760ec0f354a7c",
                 "shasum": ""
             },
             "require": {
@@ -135,7 +135,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2020-01-22T09:55:57+00:00"
+            "time": "2020-03-06T08:52:55+00:00"
         },
         {
             "name": "keboola/php-component",
