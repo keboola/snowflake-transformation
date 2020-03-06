@@ -152,6 +152,10 @@ class DatadirTest extends AbstractDatadirTestCase
 
     public function testQueryTagging(): void
     {
+        $createTableQuery = 'create table "query_tag" (
+  "QUERY_TEXT" varchar(200), 
+  "QUERY_TAG" varchar(200)
+);';
         // phpcs:disable Generic.Files.LineLength
         $configArray = [
             'authorization' => $this->getDatabaseConfig(),
@@ -164,8 +168,8 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first block',
                                 'script' => [
                                     'drop table if exists "query_tag";',
-                                    'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));',
-                                    'insert into "query_tag" SELECT QUERY_TEXT, QUERY_TAG FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION()) WHERE QUERY_TEXT = \'create table "query_tag" ("QUERY_TEXT" varchar(200), "QUERY_TAG" varchar(200));\' ORDER BY START_TIME DESC LIMIT 1;',
+                                    $createTableQuery,
+                                    sprintf('insert into "query_tag" SELECT QUERY_TEXT, QUERY_TAG FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION()) WHERE QUERY_TEXT = \'%s\' ORDER BY START_TIME DESC LIMIT 1;', $createTableQuery),
                                 ],
                             ],
                         ],
