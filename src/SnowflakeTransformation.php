@@ -69,6 +69,11 @@ class SnowflakeTransformation
 
             $uncommentedQuery = \SqlFormatter::removeComments($query);
 
+            // Do not execute empty queries
+            if (strlen(trim($uncommentedQuery)) == 0) {
+                continue;
+            }
+
             try {
                 $this->connection->query($uncommentedQuery);
             } catch (\Throwable $exception) {
