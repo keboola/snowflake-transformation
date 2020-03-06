@@ -22,7 +22,9 @@ class Config extends BaseConfig
     public function getDatabaseConfig(): array
     {
         try {
-            return $this->getValue(['authorization', 'workspace']);
+            $databaseConfig = $this->getValue(['authorization', 'workspace']);
+            $databaseConfig['clientSessionKeepAlive'] = true;
+            return $databaseConfig;
         } catch (\InvalidArgumentException $exception) {
             throw new ApplicationException('Missing authorization for workspace');
         }
