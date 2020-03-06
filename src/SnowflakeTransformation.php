@@ -67,8 +67,10 @@ class SnowflakeTransformation
         foreach ($queries as $query) {
             $this->logger->info(sprintf('Running query "%s".', $query));
 
+            $uncommentedQuery = \SqlFormatter::removeComments($query);
+
             try {
-                $this->connection->query($query);
+                $this->connection->query($uncommentedQuery);
             } catch (\Throwable $exception) {
                 $message = sprintf(
                     'Query "%s" in "%s" failed with error: "%s"',

@@ -3,8 +3,15 @@
     "description": "Backend for Snowflake Transformations",
     "type": "project",
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/keboola/sql-formatter"
+        }
+    ],
     "require": {
         "php": "^7.4",
+        "jdorn/sql-formatter": "dev-master",
         "keboola/common-exceptions": "^1.0",
         "keboola/db-adapter-snowflake": "1.0.4",
         "keboola/php-component": "^8.0",

@@ -4,8 +4,63 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f115a5a924f524cdb3b43532eb1c6067",
+    "content-hash": "de38c936ef9b8276ba588dbdb69c0630",
     "packages": [
+        {
+            "name": "jdorn/sql-formatter",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/sql-formatter.git",
+                "reference": "c33f7c1a6b3ee54125bb26202ccd1020d3bf221f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/sql-formatter/zipball/c33f7c1a6b3ee54125bb26202ccd1020d3bf221f",
+                "reference": "c33f7c1a6b3ee54125bb26202ccd1020d3bf221f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "bin": [
+                "bin/sql-formatter"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3.x-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "lib"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Dorn",
+                    "email": "jeremy@jeremydorn.com",
+                    "homepage": "http://jeremydorn.com/"
+                }
+            ],
+            "description": "a PHP SQL highlighting library",
+            "homepage": "https://github.com/jdorn/sql-formatter/",
+            "keywords": [
+                "highlight",
+                "sql"
+            ],
+            "support": {
+                "source": "https://github.com/keboola/sql-formatter/tree/master"
+            },
+            "time": "2019-02-13T08:57:52+00:00"
+        },
         {
             "name": "keboola/common-exceptions",
             "version": "1.0.1",
@@ -2487,7 +2542,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "jdorn/sql-formatter": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
