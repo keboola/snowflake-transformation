@@ -19,6 +19,8 @@ class SnowflakeTransformationComponent extends BaseComponent
         $snowflakeTransformation->setSession($config);
 
         $snowflakeTransformation->processBlocks($config->getBlocks());
+
+        $snowflakeTransformation->createManifestMetadata($config->getExpectedOutputTables(), $this->getDataDir());
     }
 
     protected function getConfigClass(): string

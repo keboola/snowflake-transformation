@@ -11,6 +11,8 @@ use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\SnowflakeTransformation\Config;
 use Keboola\SnowflakeTransformation\ConfigDefinition;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class DatadirTest extends AbstractDatadirTestCase
 {
@@ -123,6 +125,162 @@ class DatadirTest extends AbstractDatadirTestCase
         );
     }
 
+    public function testManifestMetadata(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    [
+                        'source' => 'testmetadata',
+                        'destination' => 'out.c-my.testmetadata',
+                    ],
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'drop table if exists "testmetadata";',
+                                    'create table "testmetadata" (id int, name varchar(200));',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->runAppWithConfig($config);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/out_c-my_testmetadata.csv.manifest';
+        $jsonDecode = new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
+        $manifestData = $jsonDecode->decode((string) file_get_contents($manifestFilePath), JsonEncoder::FORMAT);
+
+        $this->assertArrayHasKey('destination', $manifestData);
+        $this->assertArrayHasKey('metadata', $manifestData);
+        $this->assertArrayHasKey('column_metadata', $manifestData);
+
+        $expectedTableMetadata = [
+            [
+                'key' => 'KBC.database',
+                'value' => 'TRANSFORMATION_TESTING',
+            ],
+            [
+                'key' => 'KBC.schema',
+                'value' => 'TRANSFORMATION_TEST',
+            ],
+            [
+                'key' => 'KBC.name',
+                'value' => 'testmetadata',
+            ],
+        ];
+
+        $expectedColumnMetadata = [
+            'ID' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '38,0',
+                ],
+                [
+                    'key' => 'KBC.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.ordinal_position',
+                    'value' => 1,
+                ],
+            ],
+            'NAME' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'TEXT',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'STRING',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '200',
+                ],
+                [
+                    'key' => 'KBC.type',
+                    'value' => 'TEXT',
+                ],
+                [
+                    'key' => 'KBC.ordinal_position',
+                    'value' => 2,
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
+        $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
+    }
+
+    public function testInvalidManifestMetadata(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    [
+                        'source' => 'testmetadata',
+                        'destination' => 'out.c-my.testmetadata',
+                    ],
+                    [
+                        'source' => 'invalid_testmetadata',
+                        'destination' => 'out.c-my.invalid_testmetadata',
+                    ],
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'drop table if exists "testmetadata";',
+                                    'create table "testmetadata" (id int, name varchar(200));',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->runAppWithConfig(
+            $config,
+            1,
+            null,
+            "Missing create tables \"invalid_testmetadata\"\n"
+        );
+    }
+
     public function testMissingAuthorization(): void
     {
         $config = [
@@ -222,6 +380,7 @@ class DatadirTest extends AbstractDatadirTestCase
             "Transformation aborted with message \"Abort Me Please\"\n"
         );
     }
+
     private function runAppWithConfig(
         array $config,
         int $expectedReturnCode = 0,

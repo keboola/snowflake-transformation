@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a26b1e4813bd2037640cec675d552e4b",
+    "content-hash": "43475c250f6a755b413da5a3d7fc9ff0",
     "packages": [
         {
             "name": "jdorn/sql-formatter",
@@ -191,6 +191,41 @@
                 "keboola"
             ],
             "time": "2020-03-05T13:06:40+00:00"
+        },
+        {
+            "name": "keboola/php-datatypes",
+            "version": "4.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/php-datatypes.git",
+                "reference": "325fe4eff3e3dfae986ebbdb769eaefd18be6086"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/325fe4eff3e3dfae986ebbdb769eaefd18be6086",
+                "reference": "325fe4eff3e3dfae986ebbdb769eaefd18be6086",
+                "shasum": ""
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "~0.4",
+                "phpstan/phpstan": "~0.9",
+                "phpunit/phpunit": "^5.0",
+                "squizlabs/php_codesniffer": "^2.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Keboola\\Datatype\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Ondřej Hlaváček",
+                    "email": "ondrej.hlavacek@keboola.com"
+                }
+            ],
+            "time": "2019-12-05T14:49:18+00:00"
         },
         {
             "name": "keboola/retry",

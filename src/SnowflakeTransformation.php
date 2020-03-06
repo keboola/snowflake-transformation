@@ -5,8 +5,15 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\UserException;
+use Keboola\Datatype\Definition\Exception\InvalidTypeException;
+use Keboola\Datatype\Definition\GenericStorage as GenericDatatype;
+use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class SnowflakeTransformation
 {
@@ -14,13 +21,71 @@ class SnowflakeTransformation
 
     private LoggerInterface $logger;
 
+    private Config $config;
+
     private array $databaseConfig;
 
     public function __construct(Config $config, LoggerInterface $logger)
     {
         $this->logger = $logger;
+        $this->config = $config;
         $this->databaseConfig = $config->getDatabaseConfig();
         $this->connection = $this->createConnection();
+    }
+
+    public function createManifestMetadata(array $tables, string $dataDir): void
+    {
+        $getTables = $this->getTables($tables);
+        foreach ($getTables as $getTable) {
+            $tableName = $getTable['name'];
+            $outputMappingTable = array_filter($tables, function ($item) use ($tableName) {
+                if ($item['source'] !== $tableName) {
+                    return false;
+                }
+                return true;
+            });
+            $outputMappingTable = array_values($outputMappingTable);
+            $manifestData = [
+                'destination' => $outputMappingTable[0]['destination'],
+                'column_metadata' => [],
+            ];
+
+            foreach ($getTable['columns'] as $column) {
+                $datatypeKeys = ['length', 'nullable', 'default'];
+                try {
+                    $datatype = new SnowflakeDatatype(
+                        $column['type'],
+                        array_intersect_key($column, array_flip($datatypeKeys))
+                    );
+                } catch (InvalidTypeException $e) {
+                    $datatype = new GenericDatatype(
+                        $column['type'],
+                        array_intersect_key($column, array_flip($datatypeKeys))
+                    );
+                }
+                $columnMetadata = $datatype->toMetadata();
+                $nonDatatypeKeys = array_diff_key($column, array_flip($datatypeKeys));
+                foreach ($nonDatatypeKeys as $key => $value) {
+                    if ($key !== 'name') {
+                        $columnMetadata[] = [
+                            'key' => 'KBC.' . $key,
+                            'value'=> $value,
+                        ];
+                    }
+                }
+                $manifestData['column_metadata'][$column['name']] = $columnMetadata;
+            }
+
+            unset($getTable['columns']);
+            foreach ($getTable as $key => $value) {
+                $manifestData['metadata'][] = [
+                    'key' => 'KBC.' . $key,
+                    'value' => $value,
+                ];
+            }
+
+            $this->createMetadataFile($manifestData, $dataDir);
+        }
     }
 
     public function setSession(Config $config): void
@@ -104,6 +169,101 @@ class SnowflakeTransformation
                 sprintf('Transformation aborted with message "%s"', $result[0]['value'])
             );
         }
+    }
+
+    private function getTables(array $tables): array
+    {
+        if (count($tables) === 0) {
+            return [];
+        }
+
+        $tablesInSchema = $this->connection->fetchAll('SHOW TABLES IN SCHEMA');
+        array_walk($tables, function (&$item): void {
+            $item = $item['source'];
+        });
+
+        $filteredTablesInSchema = array_filter($tablesInSchema, function ($item) use ($tables) {
+            if (!in_array($item['name'], $tables)) {
+                return false;
+            }
+            return true;
+        });
+
+        if (count($filteredTablesInSchema) !== count($tables)) {
+            $missingTables = array_filter($tables, function ($item) use ($filteredTablesInSchema) {
+                foreach ($filteredTablesInSchema as $filteredTableInSchema) {
+                    if ($filteredTableInSchema['name'] === $item) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
+        }
+
+        $tableDefs = [];
+        $sqlWhereElements = [];
+        foreach ($filteredTablesInSchema as $tableInSchema) {
+            $tableDefs[$tableInSchema['name']] = [
+                'database' => isset($tableInSchema['database_name']) ? $tableInSchema['database_name'] : null,
+                'schema' => $tableInSchema['schema_name'],
+                'name' => $tableInSchema['name'],
+                'columns' => [],
+            ];
+
+            $sqlWhereElements[] = sprintf(
+                '(table_schema = %s AND table_name = %s)',
+                QueryBuilder::quote($tableInSchema['schema_name']),
+                QueryBuilder::quote($tableInSchema['name'])
+            );
+        }
+
+        $columnSql = sprintf(
+            'SELECT * FROM %s WHERE %s ORDER BY %s',
+            'information_schema.columns',
+            implode(' OR ', $sqlWhereElements),
+            'TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION'
+        );
+
+        $columns = $this->connection->fetchAll($columnSql);
+        foreach ($columns as $column) {
+            $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
+            if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
+                if (is_numeric($column['NUMERIC_SCALE'])) {
+                    $length = $column['NUMERIC_PRECISION'] . ',' . $column['NUMERIC_SCALE'];
+                } else {
+                    $length = $column['NUMERIC_PRECISION'];
+                }
+            }
+            $tableDefs[$column['TABLE_NAME']]['columns'][] = [
+                'name' => $column['COLUMN_NAME'],
+                'default' => $column['COLUMN_DEFAULT'],
+                'length' => $length,
+                'nullable' => (trim($column['IS_NULLABLE']) === 'NO') ? false : true,
+                'type' => $column['DATA_TYPE'],
+                'ordinal_position' => (int) $column['ORDINAL_POSITION'],
+            ];
+        }
+        return $tableDefs;
+    }
+
+    private function createMetadataFile(array $manifestData, string $dataDir): void
+    {
+        $dirPath = $dataDir . '/out/tables';
+
+        $filesystem = new Filesystem();
+        if (!$filesystem->exists($dirPath)) {
+            $filesystem->mkdir($dirPath);
+        }
+
+        $tablePath = sprintf(
+            '%s/%s.csv.manifest',
+            $dirPath,
+            str_replace('.', '_', $manifestData['destination'])
+        );
+
+        $jsonEncode = new JsonEncode();
+        file_put_contents($tablePath, $jsonEncode->encode($manifestData, JsonEncoder::FORMAT));
     }
 
     private function createConnection(): Connection
