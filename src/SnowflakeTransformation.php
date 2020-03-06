@@ -43,24 +43,41 @@ class SnowflakeTransformation
         });
 
         $query = sprintf('ALTER SESSION SET %s;', implode(',', $sessionVariables));
-        $this->runRetryableQuery($query, 'alter session');
+        $this->executionQueries('alter session', [$query]);
     }
 
     public function processSteps(array $steps): void
     {
         foreach ($steps as $step) {
-            foreach ($step['blocks'] as $block) {
-                $this->logger->info(sprintf('Processing block "%s".', $block['name']));
-                $this->executionQueries($block['name'], $block['script']);
-            }
+            $this->logger->info(sprintf('Processing step "%s".', $step['name']));
+            $this->processBlocks($step['blocks']);
         }
     }
 
-    public function executionQueries(string $name, array $queries): void
+    public function processBlocks(array $blocks): void
+    {
+        foreach ($blocks as $block) {
+            $this->logger->info(sprintf('Processing block "%s".', $block['name']));
+            $this->executionQueries($block['name'], $block['script']);
+        }
+    }
+
+    public function executionQueries(string $blockName, array $queries): void
     {
         foreach ($queries as $query) {
             $this->logger->info(sprintf('Running query "%s".', $query));
-            $this->runRetryableQuery($query, $name);
+
+            try {
+                $this->connection->query($query);
+            } catch (\Throwable $exception) {
+                $message = sprintf(
+                    'Query "%s" in "%s" failed with error: "%s"',
+                    $this->queryExcerpt($query),
+                    $blockName,
+                    $exception->getMessage()
+                );
+                throw new UserException($message, 0, $exception);
+            }
         }
     }
 
@@ -68,30 +85,6 @@ class SnowflakeTransformation
     {
         $connection = new Connection($this->databaseConfig);
         return $connection;
-    }
-
-    private function runRetryableQuery(string $query, string $errorMessage): void
-    {
-        $retryPolicy = new SimpleRetryPolicy(
-            SimpleRetryPolicy::DEFAULT_MAX_ATTEMPTS,
-            ['PDOException', 'ErrorException']
-        );
-        $backoffPolicy = new ExponentialBackOffPolicy();
-        $retryProxy = new RetryProxy($retryPolicy, $backoffPolicy);
-
-        try {
-            $retryProxy->call(function () use ($query): void {
-                $this->connection->query($query);
-            });
-        } catch (\Throwable $exception) {
-            $message = sprintf(
-                'Query "%s" in "%s" failed with error: "%s"',
-                $this->queryExcerpt($query),
-                $errorMessage,
-                $exception->getMessage()
-            );
-            throw new UserException($message, 0, $exception);
-        }
     }
 
     private function queryExcerpt(string $query): string
