@@ -125,6 +125,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
     public function testManifestMetadata(): void
     {
+        // phpcs:disable Generic.Files.LineLength
         $config = [
             'authorization' => $this->getDatabaseConfig(),
             'storage' => [
@@ -152,6 +153,7 @@ class DatadirTest extends AbstractDatadirTestCase
                 ],
             ],
         ];
+        // phpcs:enable
 
         $this->runAppWithConfig($config);
 
@@ -238,7 +240,7 @@ class DatadirTest extends AbstractDatadirTestCase
         ];
 
         $expectedColumns = [
-            'ID', 'NAME', 'NOTNULL'
+            'ID', 'NAME', 'NOTNULL',
         ];
 
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
