@@ -245,7 +245,9 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
         $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
-        $this->assertEquals($expectedColumns, $manifestData['columns']);
+        foreach ($expectedColumns as $expectedColumn) {
+            $this->assertContains($expectedColumn, $manifestData['columns']);
+        }
     }
 
     public function testInvalidManifestMetadata(): void
