@@ -215,8 +215,13 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ];
 
+        $expectedColumns = [
+            'ID', 'NAME'
+        ];
+
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
         $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
+        $this->assertEquals($expectedColumns, $manifestData['columns']);
     }
 
     public function testInvalidManifestMetadata(): void

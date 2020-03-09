@@ -83,6 +83,7 @@ class SnowflakeTransformation
             }
             $tableManifestOptions
                 ->setMetadata($manifestMetadata)
+                ->setColumns(array_keys($columnsMetadata))
                 ->setColumnMetadata($columnsMetadata)
             ;
             $manifestManager->writeTableManifest($outputMappingTable[0]['destination'], $tableManifestOptions);
