@@ -144,7 +144,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "testmetadata";',
-                                    'create table "testmetadata" (id int, name varchar(200));',
+                                    'create table "testmetadata" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL);',
                                 ],
                             ],
                         ],
@@ -213,10 +213,32 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'TEXT',
                 ],
             ],
+            'NOTNULL' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'TEXT',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => false,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'STRING',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '200',
+                ],
+                [
+                    'key' => 'KBC.type',
+                    'value' => 'TEXT',
+                ],
+            ],
         ];
 
         $expectedColumns = [
-            'ID', 'NAME'
+            'ID', 'NAME', 'NOTNULL'
         ];
 
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
