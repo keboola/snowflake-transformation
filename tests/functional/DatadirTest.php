@@ -246,10 +246,6 @@ class DatadirTest extends AbstractDatadirTestCase
             'storage' => [
                 'output' => [
                     [
-                        'source' => 'testmetadata',
-                        'destination' => 'out.c-my.testmetadata',
-                    ],
-                    [
                         'source' => 'invalid_testmetadata',
                         'destination' => 'out.c-my.invalid_testmetadata',
                     ],
@@ -262,10 +258,7 @@ class DatadirTest extends AbstractDatadirTestCase
                         'codes' => [
                             [
                                 'name' => 'first code',
-                                'script' => [
-                                    'drop table if exists "testmetadata";',
-                                    'create table "testmetadata" (id int, name varchar(200));',
-                                ],
+                                'script' => [],
                             ],
                         ],
                     ],
