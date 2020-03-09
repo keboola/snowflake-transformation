@@ -48,7 +48,9 @@ class SnowflakeTransformation
             $tableManifestOptions->setDestination($outputMappingTable[0]['destination']);
 
             $columnsMetadata = [];
+            $columnsName = [];
             foreach ($getTable['columns'] as $column) {
+                $columnsName[] = (string) $column['name'];
                 $datatypeKeys = ['length', 'nullable', 'default'];
                 try {
                     $datatype = new SnowflakeDatatype(
@@ -83,7 +85,7 @@ class SnowflakeTransformation
             }
             $tableManifestOptions
                 ->setMetadata($manifestMetadata)
-                ->setColumns(array_keys($columnsMetadata))
+                ->setColumns($columnsName)
                 ->setColumnMetadata($columnsMetadata)
             ;
             $manifestManager->writeTableManifest($outputMappingTable[0]['destination'], $tableManifestOptions);
