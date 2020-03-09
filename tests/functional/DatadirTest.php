@@ -11,8 +11,6 @@ use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\SnowflakeTransformation\Config;
 use Keboola\SnowflakeTransformation\ConfigDefinition;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class DatadirTest extends AbstractDatadirTestCase
 {
@@ -165,14 +163,6 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $expectedTableMetadata = [
             [
-                'key' => 'KBC.database',
-                'value' => 'TRANSFORMATION_TESTING',
-            ],
-            [
-                'key' => 'KBC.schema',
-                'value' => 'TRANSFORMATION_TEST',
-            ],
-            [
                 'key' => 'KBC.name',
                 'value' => 'testmetadata',
             ],
@@ -200,10 +190,6 @@ class DatadirTest extends AbstractDatadirTestCase
                     'key' => 'KBC.type',
                     'value' => 'NUMBER',
                 ],
-                [
-                    'key' => 'KBC.ordinal_position',
-                    'value' => 1,
-                ],
             ],
             'NAME' => [
                 [
@@ -225,10 +211,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 [
                     'key' => 'KBC.type',
                     'value' => 'TEXT',
-                ],
-                [
-                    'key' => 'KBC.ordinal_position',
-                    'value' => 2,
                 ],
             ],
         ];

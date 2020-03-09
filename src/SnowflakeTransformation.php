@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeTransformation;
 
+use Keboola\Component\Manifest\ManifestManager;
 use Keboola\Component\UserException;
 use Keboola\Datatype\Definition\Exception\InvalidTypeException;
 use Keboola\Datatype\Definition\GenericStorage as GenericDatatype;
@@ -176,54 +177,28 @@ class SnowflakeTransformation
         if (count($tables) === 0) {
             return [];
         }
-
-        $tablesInSchema = $this->connection->fetchAll('SHOW TABLES IN SCHEMA');
         $sourceTables = array_map(function ($item) {
             return $item['source'];
         }, $tables);
 
-        $filteredTablesInSchema = array_filter($tablesInSchema, function ($item) use ($sourceTables) {
-            if (!in_array($item['name'], $sourceTables)) {
-                return false;
-            }
-            return true;
-        });
-
-        if (count($filteredTablesInSchema) !== count($sourceTables)) {
-            $missingTables = array_diff(
-                $sourceTables,
-                array_map(function (array $item): string {
-                    return $item['name'];
-                }, $filteredTablesInSchema)
-            );
-            throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
-        }
+        $columnSql = sprintf(
+            'SELECT * FROM %s WHERE TABLE_NAME IN (%s)',
+            'information_schema.columns',
+            implode(', ', array_map(function ($item) {
+                return QueryBuilder::quote($item);
+            }, $sourceTables))
+        );
+        $columns = $this->connection->fetchAll($columnSql);
 
         $tableDefs = [];
-        $sqlWhereElements = [];
-        foreach ($filteredTablesInSchema as $tableInSchema) {
-            $tableDefs[$tableInSchema['name']] = [
-                'database' => isset($tableInSchema['database_name']) ? $tableInSchema['database_name'] : null,
-                'schema' => $tableInSchema['schema_name'],
-                'name' => $tableInSchema['name'],
-                'columns' => [],
-            ];
-
-            $sqlWhereElements[] = sprintf(
-                '(table_schema = %s AND table_name = %s)',
-                QueryBuilder::quote($tableInSchema['schema_name']),
-                QueryBuilder::quote($tableInSchema['name'])
-            );
-        }
-
-        $columnSql = sprintf(
-            'SELECT * FROM %s WHERE %s',
-            'information_schema.columns',
-            implode(' OR ', $sqlWhereElements)
-        );
-
-        $columns = $this->connection->fetchAll($columnSql);
         foreach ($columns as $column) {
+            if (!isset($tableDefs[$column['TABLE_NAME']])) {
+                $tableDefs[$column['TABLE_NAME']] = [
+                    'name' => $column['TABLE_NAME'],
+                    'columns' => [],
+                ];
+            }
+
             $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
             if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
                 if (is_numeric($column['NUMERIC_SCALE'])) {
@@ -232,14 +207,24 @@ class SnowflakeTransformation
                     $length = $column['NUMERIC_PRECISION'];
                 }
             }
+
             $tableDefs[$column['TABLE_NAME']]['columns'][] = [
                 'name' => $column['COLUMN_NAME'],
                 'default' => $column['COLUMN_DEFAULT'],
                 'length' => $length,
                 'nullable' => (trim($column['IS_NULLABLE']) === 'NO') ? false : true,
                 'type' => $column['DATA_TYPE'],
-                'ordinal_position' => (int) $column['ORDINAL_POSITION'],
             ];
+        }
+
+        if (count($tableDefs) !== count($sourceTables)) {
+            $missingTables = array_diff(
+                $sourceTables,
+                array_map(function (array $item): string {
+                    return $item['name'];
+                }, $tableDefs)
+            );
+            throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
         }
         return $tableDefs;
     }
