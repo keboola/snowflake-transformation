@@ -155,7 +155,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $this->runAppWithConfig($config);
 
-        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/out_c-my_testmetadata.csv.manifest';
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/out.c-my.testmetadata.manifest';
         $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
         $this->assertArrayHasKey('destination', $manifestData);
         $this->assertArrayHasKey('metadata', $manifestData);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\BaseComponent;
+use Keboola\Component\Manifest\ManifestManager;
 
 class SnowflakeTransformationComponent extends BaseComponent
 {
@@ -20,7 +21,10 @@ class SnowflakeTransformationComponent extends BaseComponent
 
         $snowflakeTransformation->processBlocks($config->getBlocks());
 
-        $snowflakeTransformation->createManifestMetadata($config->getExpectedOutputTables(), $this->getDataDir());
+        $snowflakeTransformation->createManifestMetadata(
+            $config->getExpectedOutputTables(),
+            new ManifestManager($this->getDataDir())
+        );
     }
 
     protected function getConfigClass(): string

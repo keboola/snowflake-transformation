@@ -12,9 +12,7 @@ use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 
 class SnowflakeTransformation
 {
@@ -34,10 +32,11 @@ class SnowflakeTransformation
         $this->connection = $this->createConnection();
     }
 
-    public function createManifestMetadata(array $tables, string $dataDir): void
+    public function createManifestMetadata(array $tables, ManifestManager $manifestManager): void
     {
         $getTables = $this->getTables($tables);
         foreach ($getTables as $getTable) {
+            $tableManifestOptions = new OutTableManifestOptions();
             $tableName = $getTable['name'];
             $outputMappingTable = array_filter($tables, function ($item) use ($tableName) {
                 if ($item['source'] !== $tableName) {
@@ -46,11 +45,9 @@ class SnowflakeTransformation
                 return true;
             });
             $outputMappingTable = array_values($outputMappingTable);
-            $manifestData = [
-                'destination' => $outputMappingTable[0]['destination'],
-                'column_metadata' => [],
-            ];
+            $tableManifestOptions->setDestination($outputMappingTable[0]['destination']);
 
+            $columnsMetadata = [];
             foreach ($getTable['columns'] as $column) {
                 $datatypeKeys = ['length', 'nullable', 'default'];
                 try {
@@ -74,18 +71,21 @@ class SnowflakeTransformation
                         ];
                     }
                 }
-                $manifestData['column_metadata'][$column['name']] = $columnMetadata;
+                $columnsMetadata[$column['name']] = $columnMetadata;
             }
-
             unset($getTable['columns']);
+            $manifestMetadata = [];
             foreach ($getTable as $key => $value) {
-                $manifestData['metadata'][] = [
+                $manifestMetadata[] = [
                     'key' => 'KBC.' . $key,
                     'value' => $value,
                 ];
             }
-
-            $this->createMetadataFile($manifestData, $dataDir);
+            $tableManifestOptions
+                ->setMetadata($manifestMetadata)
+                ->setColumnMetadata($columnsMetadata)
+            ;
+            $manifestManager->writeTableManifest($outputMappingTable[0]['destination'], $tableManifestOptions);
         }
     }
 
@@ -227,25 +227,6 @@ class SnowflakeTransformation
             throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
         }
         return $tableDefs;
-    }
-
-    private function createMetadataFile(array $manifestData, string $dataDir): void
-    {
-        $dirPath = $dataDir . '/out/tables';
-
-        $filesystem = new Filesystem();
-        if (!$filesystem->exists($dirPath)) {
-            $filesystem->mkdir($dirPath);
-        }
-
-        $tablePath = sprintf(
-            '%s/%s.csv.manifest',
-            $dirPath,
-            str_replace('.', '_', $manifestData['destination'])
-        );
-
-        $jsonEncode = new JsonEncode();
-        file_put_contents($tablePath, $jsonEncode->encode($manifestData, JsonEncoder::FORMAT));
     }
 
     private function createConnection(): Connection
