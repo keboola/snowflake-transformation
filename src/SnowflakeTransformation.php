@@ -217,10 +217,9 @@ class SnowflakeTransformation
         }
 
         $columnSql = sprintf(
-            'SELECT * FROM %s WHERE %s ORDER BY %s',
+            'SELECT * FROM %s WHERE %s',
             'information_schema.columns',
-            implode(' OR ', $sqlWhereElements),
-            'TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION'
+            implode(' OR ', $sqlWhereElements)
         );
 
         $columns = $this->connection->fetchAll($columnSql);
