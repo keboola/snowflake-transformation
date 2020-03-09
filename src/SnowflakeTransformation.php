@@ -178,26 +178,24 @@ class SnowflakeTransformation
         }
 
         $tablesInSchema = $this->connection->fetchAll('SHOW TABLES IN SCHEMA');
-        array_walk($tables, function (&$item): void {
-            $item = $item['source'];
-        });
+        $sourceTables = array_map(function ($item) {
+            return $item['source'];
+        }, $tables);
 
-        $filteredTablesInSchema = array_filter($tablesInSchema, function ($item) use ($tables) {
-            if (!in_array($item['name'], $tables)) {
+        $filteredTablesInSchema = array_filter($tablesInSchema, function ($item) use ($sourceTables) {
+            if (!in_array($item['name'], $sourceTables)) {
                 return false;
             }
             return true;
         });
 
-        if (count($filteredTablesInSchema) !== count($tables)) {
-            $missingTables = array_filter($tables, function ($item) use ($filteredTablesInSchema) {
-                foreach ($filteredTablesInSchema as $filteredTableInSchema) {
-                    if ($filteredTableInSchema['name'] === $item) {
-                        return false;
-                    }
-                }
-                return true;
-            });
+        if (count($filteredTablesInSchema) !== count($sourceTables)) {
+            $missingTables = array_diff(
+                $sourceTables,
+                array_map(function (array $item): string {
+                    return $item['name'];
+                }, $filteredTablesInSchema)
+            );
             throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
         }
 
