@@ -16,6 +16,8 @@ use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 
 class SnowflakeTransformation
 {
+    private const ABORT_TRANSFORMATION = 'ABORT_TRANSFORMATION';
+
     private Connection $connection;
 
     private LoggerInterface $logger;
@@ -156,13 +158,21 @@ class SnowflakeTransformation
                 throw new UserException($message, 0, $exception);
             }
 
-            $this->checkUserTermination();
+            $pattern = sprintf('/%s/i', self::ABORT_TRANSFORMATION);
+            if (preg_match($pattern, $uncommentedQuery)) {
+                $this->checkUserTermination();
+            }
         }
     }
 
     protected function checkUserTermination(): void
     {
-        $result = $this->connection->fetchAll("SHOW VARIABLES LIKE 'ABORT_TRANSFORMATION'");
+        $result = $this->connection->fetchAll(
+            sprintf(
+                'SHOW VARIABLES LIKE %s',
+                QueryBuilder::quote(self::ABORT_TRANSFORMATION)
+            )
+        );
 
         if (count($result) === 0) {
             return;
