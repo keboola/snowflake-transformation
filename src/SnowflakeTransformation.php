@@ -53,7 +53,7 @@ class SnowflakeTransformation
             $columnsName = [];
             foreach ($getTable['columns'] as $column) {
                 $columnsName[] = (string) $column['name'];
-                $datatypeKeys = ['length', 'nullable', 'default'];
+                $datatypeKeys = ['length', 'nullable'];
                 try {
                     $datatype = new SnowflakeDatatype(
                         $column['type'],
@@ -223,7 +223,6 @@ class SnowflakeTransformation
 
             $tableDefs[$column['TABLE_NAME']]['columns'][] = [
                 'name' => $column['COLUMN_NAME'],
-                'default' => $column['COLUMN_DEFAULT'],
                 'length' => $length,
                 'nullable' => (trim($column['IS_NULLABLE']) === 'NO') ? false : true,
                 'type' => $column['DATA_TYPE'],
