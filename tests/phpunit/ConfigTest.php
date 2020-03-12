@@ -131,7 +131,6 @@ class ConfigTest extends TestCase
         return [
             'workspace' => [
                 'host' => 'xxx',
-                'port' => 'xxx',
                 'warehouse' => 'xxx',
                 'database' => 'xxx',
                 'schema' => 'xxx',

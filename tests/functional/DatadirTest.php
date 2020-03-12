@@ -502,7 +502,6 @@ class DatadirTest extends AbstractDatadirTestCase
         return [
             'workspace' => [
                 'host' => getenv('SNOWFLAKE_HOST'),
-                'port' => getenv('SNOWFLAKE_PORT'),
                 'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
                 'database' => getenv('SNOWFLAKE_DATABASE'),
                 'schema' => getenv('SNOWFLAKE_SCHEMA'),

@@ -8,7 +8,6 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 $environments = [
     'SNOWFLAKE_HOST',
-    'SNOWFLAKE_PORT',
     'SNOWFLAKE_WAREHOUSE',
     'SNOWFLAKE_DATABASE',
     'SNOWFLAKE_SCHEMA',
