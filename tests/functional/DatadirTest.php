@@ -157,9 +157,8 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $this->runAppWithConfig($config);
 
-        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/out.c-my.testmetadata.manifest';
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/testmetadata.manifest';
         $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
-        $this->assertArrayHasKey('destination', $manifestData);
         $this->assertArrayHasKey('metadata', $manifestData);
         $this->assertArrayHasKey('column_metadata', $manifestData);
 
@@ -188,10 +187,6 @@ class DatadirTest extends AbstractDatadirTestCase
                     'key' => 'KBC.datatype.length',
                     'value' => '38,0',
                 ],
-                [
-                    'key' => 'KBC.type',
-                    'value' => 'NUMBER',
-                ],
             ],
             'NAME' => [
                 [
@@ -209,10 +204,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 [
                     'key' => 'KBC.datatype.length',
                     'value' => '200',
-                ],
-                [
-                    'key' => 'KBC.type',
-                    'value' => 'TEXT',
                 ],
             ],
             'NOTNULL' => [
@@ -232,10 +223,6 @@ class DatadirTest extends AbstractDatadirTestCase
                     'key' => 'KBC.datatype.length',
                     'value' => '200',
                 ],
-                [
-                    'key' => 'KBC.type',
-                    'value' => 'TEXT',
-                ],
             ],
             'DECIMAL' => [
                 [
@@ -254,10 +241,6 @@ class DatadirTest extends AbstractDatadirTestCase
                     'key' => 'KBC.datatype.length',
                     'value' => '10,2',
                 ],
-                [
-                    'key' => 'KBC.type',
-                    'value' => 'NUMBER',
-                ],
             ],
             'NUMERIC' => [
                 [
@@ -275,10 +258,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 [
                     'key' => 'KBC.datatype.length',
                     'value' => '38,0',
-                ],
-                [
-                    'key' => 'KBC.type',
-                    'value' => 'NUMBER',
                 ],
             ],
         ];

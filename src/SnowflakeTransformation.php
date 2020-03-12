@@ -38,45 +38,24 @@ class SnowflakeTransformation
     {
         $tableStructures = $this->getTables($tableNames);
         foreach ($tableStructures as $tableStructure) {
-            $tableManifestOptions = new OutTableManifestOptions();
-            $tableName = $tableStructure['name'];
-            $outputMappingTable = array_filter($tableNames, function ($item) use ($tableName) {
-                if ($item['source'] !== $tableName) {
-                    return false;
-                }
-                return true;
-            });
-            $outputMappingTable = array_values($outputMappingTable);
-            $tableManifestOptions->setDestination($outputMappingTable[0]['destination']);
-
             $columnsMetadata = [];
             $columnNames = [];
             foreach ($tableStructure['columns'] as $column) {
                 $columnNames[] = $column['name'];
-                $datatypeKeys = ['length', 'nullable'];
+                $datatypeKeys = array_flip(['length', 'nullable']);
                 try {
                     $datatype = new SnowflakeDatatype(
                         $column['type'],
-                        array_intersect_key($column, array_flip($datatypeKeys))
+                        array_intersect_key($column, $datatypeKeys)
                     );
                 } catch (InvalidTypeException $e) {
                     unset($column['length']);
                     $datatype = new GenericDatatype(
                         $column['type'],
-                        array_intersect_key($column, array_flip($datatypeKeys))
+                        array_intersect_key($column, $datatypeKeys)
                     );
                 }
-                $columnMetadata = $datatype->toMetadata();
-                $nonDatatypeKeys = array_diff_key($column, array_flip($datatypeKeys));
-                foreach ($nonDatatypeKeys as $key => $value) {
-                    if ($key !== 'name') {
-                        $columnMetadata[] = [
-                            'key' => 'KBC.' . $key,
-                            'value'=> $value,
-                        ];
-                    }
-                }
-                $columnsMetadata[$column['name']] = $columnMetadata;
+                $columnsMetadata[$column['name']] = $datatype->toMetadata();
             }
             unset($tableStructure['columns']);
             $tableMetadata = [];
@@ -86,12 +65,14 @@ class SnowflakeTransformation
                     'value' => $value,
                 ];
             }
+
+            $tableManifestOptions = new OutTableManifestOptions();
             $tableManifestOptions
                 ->setMetadata($tableMetadata)
                 ->setColumns($columnNames)
                 ->setColumnMetadata($columnsMetadata)
             ;
-            $manifestManager->writeTableManifest($outputMappingTable[0]['destination'], $tableManifestOptions);
+            $manifestManager->writeTableManifest($tableStructure['name'], $tableManifestOptions);
         }
     }
 
