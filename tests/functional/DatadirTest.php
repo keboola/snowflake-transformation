@@ -130,9 +130,11 @@ class DatadirTest extends AbstractDatadirTestCase
             'authorization' => $this->getDatabaseConfig(),
             'storage' => [
                 'output' => [
-                    [
-                        'source' => 'testmetadata',
-                        'destination' => 'out.c-my.testmetadata',
+                    'tables' => [
+                        [
+                            'source' => 'testmetadata',
+                            'destination' => 'out.c-my.testmetadata',
+                        ],
                     ],
                 ],
             ],
@@ -284,7 +286,9 @@ class DatadirTest extends AbstractDatadirTestCase
         ];
 
         $expectedColumns = [
-            'ID', 'NAME', 'NOTNULL',
+            'ID',
+            'NAME',
+            'NOTNULL',
         ];
 
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
@@ -306,7 +310,7 @@ class DatadirTest extends AbstractDatadirTestCase
                             [
                                 'name' => 'first code',
                                 'script' => [
-                                    'create table if not exists "ABORT_TRANSFORMATION" (id int);'
+                                    'create table if not exists "ABORT_TRANSFORMATION" (id int);',
                                 ],
                             ],
                         ],
@@ -329,9 +333,11 @@ class DatadirTest extends AbstractDatadirTestCase
             'authorization' => $this->getDatabaseConfig(),
             'storage' => [
                 'output' => [
-                    [
-                        'source' => 'invalid_testmetadata',
-                        'destination' => 'out.c-my.invalid_testmetadata',
+                    'tables' => [
+                        [
+                            'source' => 'invalid_testmetadata',
+                            'destination' => 'out.c-my.invalid_testmetadata',
+                        ],
                     ],
                 ],
             ],

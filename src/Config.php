@@ -19,14 +19,6 @@ class Config extends BaseConfig
         return $this->getValue(['parameters', 'blocks']);
     }
 
-    /**
-     * @return mixed[][]
-     */
-    public function getExpectedOutputTables(): array
-    {
-        return $this->getValue(['storage', 'output'], []);
-    }
-
     public function getDatabaseConfig(): array
     {
         try {
