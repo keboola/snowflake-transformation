@@ -252,7 +252,7 @@ class SnowflakeTransformation
 
     private function queryExcerpt(string $query): string
     {
-        if (strlen($query) > 1000) {
+        if (mb_strlen($query) > 1000) {
             return mb_substr($query, 0, 500, 'UTF-8') . "\n...\n" . mb_substr($query, -500, null, 'UTF-8');
         }
         return $query;
