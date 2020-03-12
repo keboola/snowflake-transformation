@@ -196,8 +196,20 @@ class SnowflakeTransformation
             return $item['source'];
         }, $tables);
 
+        $nameColumns = [
+            'TABLE_NAME',
+            'COLUMN_NAME',
+            'CHARACTER_MAXIMUM_LENGTH',
+            'NUMERIC_PRECISION',
+            'NUMERIC_SCALE',
+            'IS_NULLABLE',
+            'DATA_TYPE',
+        ];
         $columnSql = sprintf(
-            'SELECT * FROM %s WHERE TABLE_NAME IN (%s)',
+            'SELECT %s FROM %s WHERE TABLE_NAME IN (%s)',
+            implode(', ', array_map(function ($item) {
+                return QueryBuilder::quoteIdentifier($item);
+            }, $nameColumns)),
             'information_schema.columns',
             implode(', ', array_map(function ($item) {
                 return QueryBuilder::quote($item);
