@@ -237,14 +237,11 @@ class SnowflakeTransformation
             ];
         }
 
-        if (count($tableDefs) !== count($sourceTables)) {
-            $missingTables = array_diff(
-                $sourceTables,
-                array_map(function (array $item): string {
-                    return $item['name'];
-                }, $tableDefs)
+        $missingTables = array_diff($sourceTables, array_keys($tableDefs));
+        if ($missingTables) {
+            throw new UserException(
+                sprintf('Missing create tables "%s"', implode('", "', $missingTables))
             );
-            throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
         }
         return $tableDefs;
     }
