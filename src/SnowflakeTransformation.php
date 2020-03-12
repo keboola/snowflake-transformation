@@ -159,7 +159,7 @@ class SnowflakeTransformation
                 throw new UserException($message, 0, $exception);
             }
 
-            $pattern = sprintf('/%s/i', self::ABORT_TRANSFORMATION);
+            $pattern = sprintf('/%s/i', preg_quote(self::ABORT_TRANSFORMATION, '/'));
             if (preg_match($pattern, $uncommentedQuery)) {
                 $this->checkUserTermination();
             }
