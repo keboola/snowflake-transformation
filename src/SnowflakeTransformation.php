@@ -31,7 +31,7 @@ class SnowflakeTransformation
         $this->logger = $logger;
         $this->config = $config;
         $this->databaseConfig = $config->getDatabaseConfig();
-        $this->connection = $this->createConnection();
+        $this->connection = new Connection($this->databaseConfig);
     }
 
     public function createManifestMetadata(array $tables, ManifestManager $manifestManager): void
@@ -236,12 +236,6 @@ class SnowflakeTransformation
             throw new UserException(sprintf('Missing create tables "%s"', implode('", "', $missingTables)));
         }
         return $tableDefs;
-    }
-
-    private function createConnection(): Connection
-    {
-        $connection = new Connection($this->databaseConfig);
-        return $connection;
     }
 
     private function queryExcerpt(string $query): string
