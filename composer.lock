@@ -194,16 +194,16 @@
         },
         {
             "name": "keboola/php-datatypes",
-            "version": "4.2.1",
+            "version": "4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-datatypes.git",
-                "reference": "325fe4eff3e3dfae986ebbdb769eaefd18be6086"
+                "reference": "45ff3e6003883714ece3ecb008fec8c693f2ae74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/325fe4eff3e3dfae986ebbdb769eaefd18be6086",
-                "reference": "325fe4eff3e3dfae986ebbdb769eaefd18be6086",
+                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/45ff3e6003883714ece3ecb008fec8c693f2ae74",
+                "reference": "45ff3e6003883714ece3ecb008fec8c693f2ae74",
                 "shasum": ""
             },
             "require-dev": {
@@ -225,7 +225,7 @@
                     "email": "ondrej.hlavacek@keboola.com"
                 }
             ],
-            "time": "2019-12-05T14:49:18+00:00"
+            "time": "2020-03-12T13:39:06+00:00"
         },
         {
             "name": "monolog/monolog",
