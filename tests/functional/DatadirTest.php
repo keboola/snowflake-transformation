@@ -441,6 +441,34 @@ class DatadirTest extends AbstractDatadirTestCase
         );
     }
 
+    public function testSkipQuery(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    '',
+                                    'SELECT 1',
+                                    'select 1',
+                                    '# create table if not exists "test" (id int)',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $process = $this->runAppWithConfig($config);
+
+        $this->assertEquals(1, substr_count($process->getOutput(), 'Running query'));
+    }
+
     private function runAppWithConfig(
         array $config,
         int $expectedReturnCode = 0,
