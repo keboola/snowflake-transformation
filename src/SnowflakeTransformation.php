@@ -240,7 +240,10 @@ class SnowflakeTransformation
         $missingTables = array_diff($sourceTables, array_keys($tableDefs));
         if ($missingTables) {
             throw new UserException(
-                sprintf('Missing create tables "%s"', implode('", "', $missingTables))
+                sprintf(
+                    'Tables "%s" specified in output were not created by the transformation.',
+                    implode('", "', $missingTables)
+                )
             );
         }
         return $tableDefs;

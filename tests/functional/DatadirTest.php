@@ -360,7 +360,7 @@ class DatadirTest extends AbstractDatadirTestCase
             $config,
             1,
             null,
-            "Missing create tables \"invalid_testmetadata\"\n"
+            "Tables \"invalid_testmetadata\" specified in output were not created by the transformation\n"
         );
     }
 
