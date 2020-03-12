@@ -14,8 +14,6 @@ use Symfony\Component\Process\Process;
 
 class DatadirTest extends AbstractDatadirTestCase
 {
-    protected Connection $db;
-
     public function testTransformData(): void
     {
         // phpcs:disable Generic.Files.LineLength
