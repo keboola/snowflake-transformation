@@ -294,6 +294,35 @@ class DatadirTest extends AbstractDatadirTestCase
         }
     }
 
+    public function testAbortTransformationWithoutVariable(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'create table if not exists "ABORT_TRANSFORMATION" (id int);'
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $process = $this->runAppWithConfig(
+            $config,
+            0
+        );
+
+        $this->assertStringContainsString('Checking user termination', $process->getOutput());
+    }
+
     public function testInvalidManifestMetadata(): void
     {
         $config = [
