@@ -134,8 +134,6 @@ class SnowflakeTransformation
     public function executionQueries(string $blockName, array $queries): void
     {
         foreach ($queries as $query) {
-            $this->logger->info(sprintf('Running query "%s".', $query));
-
             $uncommentedQuery = \SqlFormatter::removeComments($query);
 
             // Do not execute empty queries
@@ -147,6 +145,7 @@ class SnowflakeTransformation
                 continue;
             }
 
+            $this->logger->info(sprintf('Running query "%s".', $this->queryExcerpt($query)));
             try {
                 $this->connection->query($uncommentedQuery);
             } catch (\Throwable $exception) {
