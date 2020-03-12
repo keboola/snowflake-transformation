@@ -11,11 +11,14 @@
     ],
     "require": {
         "php": "^7.4",
+        "ext-json": "*",
+        "ext-mbstring": "*",
         "jdorn/sql-formatter": "dev-master",
         "keboola/common-exceptions": "^1.0",
         "keboola/db-adapter-snowflake": "1.0.5",
         "keboola/php-component": "^8.0",
-        "keboola/php-datatypes": "^4.2"
+        "keboola/php-datatypes": "^4.2",
+        "symfony/config": "^5.0"
     },
     "require-dev": {
         "jakub-onderka/php-parallel-lint": "^1.0",
