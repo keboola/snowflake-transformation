@@ -60,6 +60,7 @@ class SnowflakeTransformation
                         array_intersect_key($column, array_flip($datatypeKeys))
                     );
                 } catch (InvalidTypeException $e) {
+                    unset($column['length']);
                     $datatype = new GenericDatatype(
                         $column['type'],
                         array_intersect_key($column, array_flip($datatypeKeys))
@@ -212,18 +213,13 @@ class SnowflakeTransformation
                 ];
             }
 
-            $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
-            if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
-                if (is_numeric($column['NUMERIC_SCALE'])) {
-                    $length = $column['NUMERIC_PRECISION'] . ',' . $column['NUMERIC_SCALE'];
-                } else {
-                    $length = $column['NUMERIC_PRECISION'];
-                }
-            }
-
             $tableDefs[$column['TABLE_NAME']]['columns'][] = [
                 'name' => $column['COLUMN_NAME'],
-                'length' => $length,
+                'length' => [
+                    'character_maximum' => $column['CHARACTER_MAXIMUM_LENGTH'],
+                    'numeric_precision' => $column['NUMERIC_PRECISION'],
+                    'numeric_scale' => $column['NUMERIC_SCALE'],
+                ],
                 'nullable' => (trim($column['IS_NULLABLE']) === 'NO') ? false : true,
                 'type' => $column['DATA_TYPE'],
             ];

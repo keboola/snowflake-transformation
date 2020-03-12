@@ -145,7 +145,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "testmetadata";',
-                                    'create table "testmetadata" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL);',
+                                    'create table "testmetadata" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
                                 ],
                             ],
                         ],
@@ -235,6 +235,50 @@ class DatadirTest extends AbstractDatadirTestCase
                 [
                     'key' => 'KBC.type',
                     'value' => 'TEXT',
+                ],
+            ],
+            'DECIMAL' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '10,2',
+                ],
+                [
+                    'key' => 'KBC.type',
+                    'value' => 'NUMBER',
+                ],
+            ],
+            'NUMERIC' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '38,0',
+                ],
+                [
+                    'key' => 'KBC.type',
+                    'value' => 'NUMBER',
                 ],
             ],
         ];
