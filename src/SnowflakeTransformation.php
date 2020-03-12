@@ -52,7 +52,7 @@ class SnowflakeTransformation
             $columnsMetadata = [];
             $columnNames = [];
             foreach ($tableStructure['columns'] as $column) {
-                $columnNames[] = (string) $column['name'];
+                $columnNames[] = $column['name'];
                 $datatypeKeys = ['length', 'nullable'];
                 try {
                     $datatype = new SnowflakeDatatype(
