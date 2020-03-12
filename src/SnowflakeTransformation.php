@@ -34,13 +34,13 @@ class SnowflakeTransformation
         $this->connection = new Connection($this->databaseConfig);
     }
 
-    public function createManifestMetadata(array $tables, ManifestManager $manifestManager): void
+    public function createManifestMetadata(array $tableNames, ManifestManager $manifestManager): void
     {
-        $getTables = $this->getTables($tables);
-        foreach ($getTables as $getTable) {
+        $tableStructures = $this->getTables($tableNames);
+        foreach ($tableStructures as $tableStructure) {
             $tableManifestOptions = new OutTableManifestOptions();
-            $tableName = $getTable['name'];
-            $outputMappingTable = array_filter($tables, function ($item) use ($tableName) {
+            $tableName = $tableStructure['name'];
+            $outputMappingTable = array_filter($tableNames, function ($item) use ($tableName) {
                 if ($item['source'] !== $tableName) {
                     return false;
                 }
@@ -50,9 +50,9 @@ class SnowflakeTransformation
             $tableManifestOptions->setDestination($outputMappingTable[0]['destination']);
 
             $columnsMetadata = [];
-            $columnsName = [];
-            foreach ($getTable['columns'] as $column) {
-                $columnsName[] = (string) $column['name'];
+            $columnNames = [];
+            foreach ($tableStructure['columns'] as $column) {
+                $columnNames[] = (string) $column['name'];
                 $datatypeKeys = ['length', 'nullable'];
                 try {
                     $datatype = new SnowflakeDatatype(
@@ -78,17 +78,17 @@ class SnowflakeTransformation
                 }
                 $columnsMetadata[$column['name']] = $columnMetadata;
             }
-            unset($getTable['columns']);
-            $manifestMetadata = [];
-            foreach ($getTable as $key => $value) {
-                $manifestMetadata[] = [
+            unset($tableStructure['columns']);
+            $tableMetadata = [];
+            foreach ($tableStructure as $key => $value) {
+                $tableMetadata[] = [
                     'key' => 'KBC.' . $key,
                     'value' => $value,
                 ];
             }
             $tableManifestOptions
-                ->setMetadata($manifestMetadata)
-                ->setColumns($columnsName)
+                ->setMetadata($tableMetadata)
+                ->setColumns($columnNames)
                 ->setColumnMetadata($columnsMetadata)
             ;
             $manifestManager->writeTableManifest($outputMappingTable[0]['destination'], $tableManifestOptions);
@@ -112,7 +112,7 @@ class SnowflakeTransformation
         });
 
         $query = sprintf('ALTER SESSION SET %s;', implode(',', $sessionVariables));
-        $this->executionQueries('alter session', [$query]);
+        $this->executeQueries('alter session', [$query]);
     }
 
     public function processBlocks(array $blocks): void
@@ -126,12 +126,12 @@ class SnowflakeTransformation
     public function processCodes(array $codes): void
     {
         foreach ($codes as $code) {
-            $this->logger->info(sprintf('Processing codes "%s".', $code['name']));
-            $this->executionQueries($code['name'], $code['script']);
+            $this->logger->info(sprintf('Processing code "%s".', $code['name']));
+            $this->executeQueries($code['name'], $code['script']);
         }
     }
 
-    public function executionQueries(string $blockName, array $queries): void
+    public function executeQueries(string $blockName, array $queries): void
     {
         foreach ($queries as $query) {
             $uncommentedQuery = \SqlFormatter::removeComments($query);
