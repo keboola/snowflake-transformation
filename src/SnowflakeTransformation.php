@@ -168,6 +168,7 @@ class SnowflakeTransformation
 
     protected function checkUserTermination(): void
     {
+        $this->logger->info('Checking user termination');
         $result = $this->connection->fetchAll(
             sprintf(
                 'SHOW VARIABLES LIKE %s',
