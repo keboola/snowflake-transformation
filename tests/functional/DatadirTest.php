@@ -8,8 +8,6 @@ use Keboola\DatadirTests\AbstractDatadirTestCase;
 use Keboola\DatadirTests\DatadirTestSpecification;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
-use Keboola\SnowflakeTransformation\Config;
-use Keboola\SnowflakeTransformation\ConfigDefinition;
 use Symfony\Component\Process\Process;
 
 class DatadirTest extends AbstractDatadirTestCase
@@ -40,9 +38,8 @@ class DatadirTest extends AbstractDatadirTestCase
         // phpcs:enable
 
         $this->runAppWithConfig($configArray);
-
-        $config = $this->getConfigFromUserConfig($configArray);
-        $insertedData = $this->getConnection($config)->fetchAll(
+        $connection = new Connection($configArray['authorization']['workspace']);
+        $insertedData = $connection->fetchAll(
             sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('output'))
         );
         $this->assertEquals($insertedData, [
@@ -399,9 +396,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $this->runAppWithConfig($configArray);
 
-        $config = $this->getConfigFromUserConfig($configArray);
-
-        $connection = $this->getConnection($config);
+        $connection = new Connection($configArray['authorization']['workspace']);
 
         $insertedData = $connection->fetchAll(
             sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('query_tag'))
@@ -492,16 +487,6 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertMatchesSpecification($specification, $process, $tempDatadir->getTmpFolder());
 
         return $process;
-    }
-
-    private function getConfigFromUserConfig(array $userConfig): Config
-    {
-        return new Config($userConfig, new ConfigDefinition());
-    }
-
-    private function getConnection(Config $config): Connection
-    {
-        return new Connection($config->getDatabaseConfig());
     }
 
     private function getDatabaseConfig(): array
