@@ -284,16 +284,16 @@ class DatadirTest extends AbstractDatadirTestCase
         ];
 
         $expectedColumns = [
+            'DECIMAL',
             'ID',
             'NAME',
             'NOTNULL',
+            'NUMERIC',
         ];
-
+        sort($manifestData['columns']);
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
         $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
-        foreach ($expectedColumns as $expectedColumn) {
-            $this->assertContains($expectedColumn, $manifestData['columns']);
-        }
+        $this->assertEquals($expectedColumns, $manifestData['columns']);
     }
 
     public function testAbortTransformationWithoutVariable(): void
@@ -358,7 +358,7 @@ class DatadirTest extends AbstractDatadirTestCase
             $config,
             1,
             null,
-            "Tables \"invalid_testmetadata\" specified in output were not created by the transformation\n"
+            "Tables \"invalid_testmetadata\" specified in output were not created by the transformation.\n"
         );
     }
 
