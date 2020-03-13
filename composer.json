@@ -1,0 +1,70 @@
+{
+    "name": "keboola/snowflake-transformation",
+    "description": "Backend for Snowflake Transformations",
+    "type": "project",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/keboola/sql-formatter"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "jdorn/sql-formatter": "dev-master",
+        "keboola/common-exceptions": "^1.0",
+        "keboola/db-adapter-snowflake": "1.0.5",
+        "keboola/php-component": "^8.0",
+        "keboola/php-datatypes": "^4.2",
+        "symfony/config": "^5.0"
+    },
+    "require-dev": {
+        "jakub-onderka/php-parallel-lint": "^1.0",
+        "keboola/coding-standard": ">=7.0.2",
+        "keboola/datadir-tests": "^4.0",
+        "keboola/php-temp": "^2.0",
+        "phpstan/phpstan": "^0.12.11",
+        "phpunit/phpunit": "^9.0",
+        "symfony/process": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Keboola\\SnowflakeTransformation\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keboola\\SnowflakeTransformation\\Tests\\": "tests/phpunit/",
+            "Keboola\\SnowflakeTransformation\\DatadirTests\\": "tests/functional/"
+        }
+    },
+    "scripts": {
+        "tests-phpunit": "phpunit",
+        "tests-datadir": "phpunit tests/functional",
+        "tests": [
+            "@tests-phpunit",
+            "@tests-datadir"
+        ],
+
+        "phpstan": "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon",
+        "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
+        "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
+        "phplint": "parallel-lint -j 10 --exclude vendor .",
+        "build": [
+            "@phplint",
+            "@phpcs",
+            "@phpstan",
+            "@tests"
+        ],
+        "ci": [
+            "@composer validate --no-check-publish --no-check-all",
+            "@build"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
+}
