@@ -18,13 +18,11 @@ docker-compose run --rm dev composer install --no-scripts
 Create `.env` file with following contents
 ```
 SNOWFLAKE_HOST=
-SNOWFLAKE_PORT=
 SNOWFLAKE_WAREHOUSE=
 SNOWFLAKE_DATABASE=
 SNOWFLAKE_SCHEMA=
 SNOWFLAKE_USER=
 SNOWFLAKE_PASSWORD=
-STORAGE_API_TOKEN=
 KBC_RUNID=
 ```
 
