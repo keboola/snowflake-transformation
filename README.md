@@ -9,9 +9,9 @@ Application which runs KBC transformations
 - `authorization` object (required): [workspace credentials](https://developers.keboola.com/extend/common-interface/folders/#exchanging-data-via-workspace)
 - `parameters`
     - `blocks` array (required): list of blocks
-        - `name` string (optional): name of the block
+        - `name` string (required): name of the block
         - `codes` array (required): list of codes
-            - `name` string (optional): name of the code
+            - `name` string (required): name of the code
             - `script` array (required): list of sql queries
 
 ## Example configuration
