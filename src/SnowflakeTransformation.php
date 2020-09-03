@@ -13,6 +13,7 @@ use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
+use SqlFormatter;
 
 class SnowflakeTransformation
 {
@@ -115,7 +116,7 @@ class SnowflakeTransformation
     public function executeQueries(string $blockName, array $queries): void
     {
         foreach ($queries as $query) {
-            $uncommentedQuery = \SqlFormatter::removeComments($query);
+            $uncommentedQuery = SqlFormatter::removeComments($query, false);
 
             // Do not execute empty queries
             if (strlen(trim($uncommentedQuery)) === 0) {
