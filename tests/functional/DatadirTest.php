@@ -464,6 +464,35 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertEquals(1, substr_count($process->getOutput(), 'Running query'));
     }
 
+    public function testCastOperatorQuery(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS accounts;',
+                                    'CREATE TABLE accounts ("account_id" varchar);',
+                                    'INSERT INTO accounts VALUES (\'123\');',
+                                    'CREATE OR REPLACE TABLE "CxAlloy_Projects" AS SELECT "account_id"::INT as account_id from accounts',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+    }
+
     private function runAppWithConfig(
         array $config,
         int $expectedReturnCode = 0,
