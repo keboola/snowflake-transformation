@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/sql-formatter.git",
-                "reference": "c33f7c1a6b3ee54125bb26202ccd1020d3bf221f"
+                "reference": "29bb19a11bdbce3605ab096c45d8dafa0794aa3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/sql-formatter/zipball/c33f7c1a6b3ee54125bb26202ccd1020d3bf221f",
-                "reference": "c33f7c1a6b3ee54125bb26202ccd1020d3bf221f",
+                "url": "https://api.github.com/repos/keboola/sql-formatter/zipball/29bb19a11bdbce3605ab096c45d8dafa0794aa3b",
+                "reference": "29bb19a11bdbce3605ab096c45d8dafa0794aa3b",
                 "shasum": ""
             },
             "require": {
@@ -59,7 +59,7 @@
             "support": {
                 "source": "https://github.com/keboola/sql-formatter/tree/master"
             },
-            "time": "2019-02-13T08:57:52+00:00"
+            "time": "2020-09-03T09:55:08+00:00"
         },
         {
             "name": "keboola/common-exceptions",
@@ -762,6 +762,7 @@
             ],
             "description": "This tool check syntax of PHP files about 20x faster than serial check.",
             "homepage": "https://github.com/JakubOnderka/PHP-Parallel-Lint",
+            "abandoned": "php-parallel-lint/php-parallel-lint",
             "time": "2018-02-24T15:31:20+00:00"
         },
         {
@@ -1590,6 +1591,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2020-02-07T06:19:00+00:00"
         },
         {
@@ -2536,5 +2538,6 @@
         "ext-json": "*",
         "ext-mbstring": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
