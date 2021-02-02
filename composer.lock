@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8711c88e73465f1433fc92a531c5c09c",
+    "content-hash": "664b889f4d665c42d4f57ab6bdb8c421",
     "packages": [
         {
             "name": "jdorn/sql-formatter",
@@ -139,20 +139,21 @@
         },
         {
             "name": "keboola/php-component",
-            "version": "8.1.0",
+            "version": "8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-component.git",
-                "reference": "f0b0a8f97e5ee4738ae3d7afd853288700e8430e"
+                "reference": "efee48865567d2c7b59d130f0f3f7c0624769a0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-component/zipball/f0b0a8f97e5ee4738ae3d7afd853288700e8430e",
-                "reference": "f0b0a8f97e5ee4738ae3d7afd853288700e8430e",
+                "url": "https://api.github.com/repos/keboola/php-component/zipball/efee48865567d2c7b59d130f0f3f7c0624769a0e",
+                "reference": "efee48865567d2c7b59d130f0f3f7c0624769a0e",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
+                "keboola/common-exceptions": "^1.0",
                 "monolog/monolog": "^2.0",
                 "php": "^7.3",
                 "symfony/config": "^5.0",
@@ -190,7 +191,11 @@
                 "docker",
                 "keboola"
             ],
-            "time": "2020-03-11T09:42:05+00:00"
+            "support": {
+                "issues": "https://github.com/keboola/php-component/issues",
+                "source": "https://github.com/keboola/php-component/tree/8.2.0"
+            },
+            "time": "2021-02-02T12:40:10+00:00"
         },
         {
             "name": "keboola/php-datatypes",
@@ -2539,5 +2544,5 @@
         "ext-mbstring": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
