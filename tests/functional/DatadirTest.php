@@ -493,6 +493,43 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($config);
     }
 
+    public function testIntColumn(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "accounts";',
+                                    'CREATE TABLE "accounts" ("1234" int);',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'accounts',
+                            'destination' => 'out.c-my.accounts',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+    }
+
     private function runAppWithConfig(
         array $config,
         int $expectedReturnCode = 0,
