@@ -14,7 +14,6 @@ use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 use SqlFormatter;
-use stdClass;
 
 class SnowflakeTransformation
 {
