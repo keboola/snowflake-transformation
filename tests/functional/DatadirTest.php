@@ -493,6 +493,48 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($config);
     }
 
+    public function testIntColumn(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "accounts";',
+                                    'CREATE TABLE "accounts" ("1234" int);',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'accounts',
+                            'destination' => 'out.c-my.accounts',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/accounts.manifest';
+        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
+
+        $this->assertEquals(['1234'], $manifestData['columns']);
+    }
+
     private function runAppWithConfig(
         array $config,
         int $expectedReturnCode = 0,

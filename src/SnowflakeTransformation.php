@@ -39,7 +39,7 @@ class SnowflakeTransformation
     {
         $tableStructures = $this->getTables($tableNames);
         foreach ($tableStructures as $tableStructure) {
-            $columnsMetadata = [];
+            $columnsMetadata = (object) [];
             $columnNames = [];
             foreach ($tableStructure['columns'] as $column) {
                 $columnNames[] = $column['name'];
@@ -56,7 +56,7 @@ class SnowflakeTransformation
                         array_intersect_key($column, $datatypeKeys)
                     );
                 }
-                $columnsMetadata[$column['name']] = $datatype->toMetadata();
+                $columnsMetadata->{$column['name']} = $datatype->toMetadata();
             }
             unset($tableStructure['columns']);
             $tableMetadata = [];
