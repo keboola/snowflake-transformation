@@ -528,6 +528,11 @@ class DatadirTest extends AbstractDatadirTestCase
         // phpcs:enable
 
         $this->runAppWithConfig($config);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/accounts.manifest';
+        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
+
+        $this->assertEquals(['1234'], $manifestData['columns']);
     }
 
     private function runAppWithConfig(
