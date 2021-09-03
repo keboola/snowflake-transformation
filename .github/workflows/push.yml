@@ -12,12 +12,12 @@ env:
   KBC_DEVELOPERPORTAL_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}
 
   # Snowflake Credentials
-  SNOWFLAKE_HOST: kebooladev.snowflakecomputing.com
+  SNOWFLAKE_HOST: "kebooladev.snowflakecomputing.com"
   SNOWFLAKE_PORT: 443
-  SNOWFLAKE_WAREHOUSE: DEV
-  SNOWFLAKE_DATABASE: snowflake_transformation
-  SNOWFLAKE_SCHEMA: snowflake_transformation
-  SNOWFLAKE_USER: snowflake_transformation
+  SNOWFLAKE_WAREHOUSE: "DEV"
+  SNOWFLAKE_DATABASE: "snowflake_transformation"
+  SNOWFLAKE_SCHEMA: "snowflake_transformation"
+  SNOWFLAKE_USER: "snowflake_transformation"
   SNOWFLAKE_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}
   KBC_RUNID: 123456
 
@@ -83,7 +83,6 @@ jobs:
           tag_as_latest: true
       - name: Run tests
         run: |
-          docker build -t ${{ env.APP_IMAGE }} .
           docker run \
             -e SNOWFLAKE_HOST \
             -e SNOWFLAKE_PORT \
