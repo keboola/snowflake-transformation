@@ -259,17 +259,8 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ];
 
-        $expectedColumns = [
-            'DECIMAL',
-            'ID',
-            'NAME',
-            'NOTNULL',
-            'NUMERIC',
-        ];
-        sort($manifestData['columns']);
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
         $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
-        $this->assertEquals($expectedColumns, $manifestData['columns']);
     }
 
     public function testAbortTransformationWithoutVariable(): void
@@ -491,48 +482,6 @@ class DatadirTest extends AbstractDatadirTestCase
         // phpcs:enable
 
         $this->runAppWithConfig($config);
-    }
-
-    public function testIntColumn(): void
-    {
-        // phpcs:disable Generic.Files.LineLength
-        $config = [
-            'authorization' => $this->getDatabaseConfig(),
-            'parameters' => [
-                'blocks' => [
-                    [
-                        'name' => 'first block',
-                        'codes' => [
-                            [
-                                'name' => 'first code',
-                                'script' => [
-                                    'DROP TABLE IF EXISTS "accounts";',
-                                    'CREATE TABLE "accounts" ("1234" int);',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'storage' => [
-                'output' => [
-                    'tables' => [
-                        [
-                            'source' => 'accounts',
-                            'destination' => 'out.c-my.accounts',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        // phpcs:enable
-
-        $this->runAppWithConfig($config);
-
-        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/accounts.manifest';
-        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
-
-        $this->assertEquals(['1234'], $manifestData['columns']);
     }
 
     private function runAppWithConfig(

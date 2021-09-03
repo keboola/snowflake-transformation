@@ -40,9 +40,7 @@ class SnowflakeTransformation
         $tableStructures = $this->getTables($tableNames);
         foreach ($tableStructures as $tableStructure) {
             $columnsMetadata = (object) [];
-            $columnNames = [];
             foreach ($tableStructure['columns'] as $column) {
-                $columnNames[] = $column['name'];
                 $datatypeKeys = array_flip(['length', 'nullable']);
                 try {
                     $datatype = new SnowflakeDatatype(
@@ -70,7 +68,6 @@ class SnowflakeTransformation
             $tableManifestOptions = new OutTableManifestOptions();
             $tableManifestOptions
                 ->setMetadata($tableMetadata)
-                ->setColumns($columnNames)
                 ->setColumnMetadata($columnsMetadata)
             ;
             $manifestManager->writeTableManifest($tableStructure['name'], $tableManifestOptions);
