@@ -166,98 +166,70 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ];
 
-        $expectedColumnMetadata = [
-            'ID' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'NUMBER',
-                ],
-                [
-                    'key' => 'KBC.datatype.nullable',
-                    'value' => true,
-                ],
-                [
-                    'key' => 'KBC.datatype.basetype',
-                    'value' => 'NUMERIC',
-                ],
-                [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '38,0',
-                ],
-            ],
-            'NAME' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'TEXT',
-                ],
-                [
-                    'key' => 'KBC.datatype.nullable',
-                    'value' => true,
-                ],
-                [
-                    'key' => 'KBC.datatype.basetype',
-                    'value' => 'STRING',
-                ],
-                [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '200',
+        $expectedColumnMetadata = $this->getExpectedColumnMetadata();
+
+        $expectedColumns = [
+            'DECIMAL',
+            'ID',
+            'NAME',
+            'NOTNULL',
+            'NUMERIC',
+        ];
+        sort($manifestData['columns']);
+        $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
+        $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
+        $this->assertEquals($expectedColumns, $manifestData['columns']);
+    }
+
+    public function testManifestMetadataWithTableNameExistingInAnotherSchema(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'TABLES',
+                            'destination' => 'out.c-my.TABLES',
+                        ],
+                    ],
                 ],
             ],
-            'NOTNULL' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'TEXT',
-                ],
-                [
-                    'key' => 'KBC.datatype.nullable',
-                    'value' => false,
-                ],
-                [
-                    'key' => 'KBC.datatype.basetype',
-                    'value' => 'STRING',
-                ],
-                [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '200',
-                ],
-            ],
-            'DECIMAL' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'NUMBER',
-                ],
-                [
-                    'key' => 'KBC.datatype.nullable',
-                    'value' => true,
-                ],
-                [
-                    'key' => 'KBC.datatype.basetype',
-                    'value' => 'NUMERIC',
-                ],
-                [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '10,2',
-                ],
-            ],
-            'NUMERIC' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'NUMBER',
-                ],
-                [
-                    'key' => 'KBC.datatype.nullable',
-                    'value' => true,
-                ],
-                [
-                    'key' => 'KBC.datatype.basetype',
-                    'value' => 'NUMERIC',
-                ],
-                [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '38,0',
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'drop table if exists "TABLES";',
+                                    'create table "TABLES" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/TABLES.manifest';
+        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
+        $this->assertArrayHasKey('metadata', $manifestData);
+        $this->assertArrayHasKey('column_metadata', $manifestData);
+
+        $expectedTableMetadata = [
+            [
+                'key' => 'KBC.name',
+                'value' => 'TABLES',
+            ],
+        ];
+
+        $expectedColumnMetadata = $this->getExpectedColumnMetadata();
 
         $expectedColumns = [
             'DECIMAL',
@@ -570,6 +542,105 @@ class DatadirTest extends AbstractDatadirTestCase
                 'schema' => getenv('SNOWFLAKE_SCHEMA'),
                 'user' => getenv('SNOWFLAKE_USER'),
                 'password' => getenv('SNOWFLAKE_PASSWORD'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    protected function getExpectedColumnMetadata(): array
+    {
+        return [
+            'ID' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '38,0',
+                ],
+            ],
+            'NAME' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'TEXT',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'STRING',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '200',
+                ],
+            ],
+            'NOTNULL' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'TEXT',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => false,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'STRING',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '200',
+                ],
+            ],
+            'DECIMAL' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '10,2',
+                ],
+            ],
+            'NUMERIC' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '38,0',
+                ],
             ],
         ];
     }
