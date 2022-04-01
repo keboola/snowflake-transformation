@@ -187,14 +187,15 @@ class SnowflakeTransformation
             'DATA_TYPE',
         ];
         $columnSql = sprintf(
-            'SELECT %s FROM %s WHERE TABLE_NAME IN (%s)',
+            'SELECT %s FROM %s WHERE TABLE_NAME IN (%s) AND TABLE_SCHEMA = %s',
             implode(', ', array_map(function ($item) {
                 return QueryBuilder::quoteIdentifier($item);
             }, $nameColumns)),
             'information_schema.columns',
             implode(', ', array_map(function ($item) {
                 return QueryBuilder::quote($item);
-            }, $sourceTables))
+            }, $sourceTables)),
+            QueryBuilder::quote($this->databaseConfig['schema'])
         );
         $columns = $this->connection->fetchAll($columnSql);
 
