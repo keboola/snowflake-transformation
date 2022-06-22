@@ -169,13 +169,13 @@ class DatadirTest extends AbstractDatadirTestCase
         $expectedColumnMetadata = $this->getExpectedColumnMetadata();
 
         $expectedColumns = [
-            'DECIMAL',
             'ID',
             'NAME',
             'NOTNULL',
             'NUMERIC',
+            'DECIMAL',
         ];
-        sort($manifestData['columns']);
+
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
         $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
         $this->assertEquals($expectedColumns, $manifestData['columns']);
@@ -232,13 +232,13 @@ class DatadirTest extends AbstractDatadirTestCase
         $expectedColumnMetadata = $this->getExpectedColumnMetadata();
 
         $expectedColumns = [
-            'DECIMAL',
             'ID',
             'NAME',
             'NOTNULL',
             'NUMERIC',
+            'DECIMAL',
         ];
-        sort($manifestData['columns']);
+
         $this->assertEquals($expectedTableMetadata, $manifestData['metadata']);
         $this->assertEquals($expectedColumnMetadata, $manifestData['column_metadata']);
         $this->assertEquals($expectedColumns, $manifestData['columns']);

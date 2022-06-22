@@ -3,3 +3,4 @@
 /data
 .env
 tests/data/config.json
+.phpunit.result.cache

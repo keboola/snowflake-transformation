@@ -23,14 +23,11 @@ class SnowflakeTransformation
 
     private LoggerInterface $logger;
 
-    private Config $config;
-
     private array $databaseConfig;
 
     public function __construct(Config $config, LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->config = $config;
         $this->databaseConfig = $config->getDatabaseConfig();
         $this->connection = new Connection($this->databaseConfig);
     }
@@ -187,7 +184,7 @@ class SnowflakeTransformation
             'DATA_TYPE',
         ];
         $columnSql = sprintf(
-            'SELECT %s FROM %s WHERE TABLE_NAME IN (%s) AND TABLE_SCHEMA = %s',
+            'SELECT %s FROM %s WHERE TABLE_NAME IN (%s) AND TABLE_SCHEMA = %s ORDER BY ORDINAL_POSITION',
             implode(', ', array_map(function ($item) {
                 return QueryBuilder::quoteIdentifier($item);
             }, $nameColumns)),
@@ -215,7 +212,7 @@ class SnowflakeTransformation
                     'numeric_precision' => $column['NUMERIC_PRECISION'],
                     'numeric_scale' => $column['NUMERIC_SCALE'],
                 ],
-                'nullable' => (trim($column['IS_NULLABLE']) === 'NO') ? false : true,
+                'nullable' => !(trim($column['IS_NULLABLE']) === 'NO'),
                 'type' => $column['DATA_TYPE'],
             ];
         }
