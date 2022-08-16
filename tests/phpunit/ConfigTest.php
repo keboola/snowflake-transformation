@@ -49,7 +49,7 @@ class ConfigTest extends TestCase
 
         $configDefinition = new ConfigDefinition();
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "blocks" at path "root.parameters" must be configured.');
+        $this->expectExceptionMessage('The child node "blocks" under "root.parameters" must be configured.');
         new Config($configArray, $configDefinition);
     }
 
@@ -68,7 +68,7 @@ class ConfigTest extends TestCase
 
         $configDefinition = new ConfigDefinition();
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "codes" at path "root.parameters.blocks.0" must be configured.');
+        $this->expectExceptionMessage('The child node "codes" under "root.parameters.blocks.0" must be configured.');
         new Config($configArray, $configDefinition);
     }
 
@@ -91,7 +91,7 @@ class ConfigTest extends TestCase
         ];
 
         $configDefinition = new ConfigDefinition();
-        $expectedMessage = 'The child node "script" at path "root.parameters.blocks.0.codes.0" must be configured.';
+        $expectedMessage = 'The child node "script" under "root.parameters.blocks.0.codes.0" must be configured.';
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
         new Config($configArray, $configDefinition);
@@ -120,7 +120,7 @@ class ConfigTest extends TestCase
         ];
 
         $configDefinition = new ConfigDefinition();
-        $expectedMessage = 'Invalid type for path "root.parameters.query_timeout". Expected int, but got string.';
+        $expectedMessage = 'Invalid type for path "root.parameters.query_timeout". Expected "int", but got "string".';
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
         new Config($configArray, $configDefinition);
