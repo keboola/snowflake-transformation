@@ -17,7 +17,7 @@
         "keboola/common-exceptions": "^1.0",
         "keboola/db-adapter-snowflake": "1.0.5",
         "keboola/php-component": "^8.2",
-        "keboola/php-datatypes": "^4.2",
+        "keboola/php-datatypes": "^6.0",
         "symfony/config": "^5.0"
     },
     "require-dev": {
@@ -65,6 +65,9 @@
     },
     "config": {
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
