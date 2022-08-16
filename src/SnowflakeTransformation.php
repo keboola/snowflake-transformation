@@ -63,6 +63,11 @@ class SnowflakeTransformation
                     'value' => $value,
                 ];
             }
+            // add metadata indicating that this output is snowflake native
+            $tableMetadata[] = [
+                'key' => 'KBC.datatype.backend',
+                'value' => 'snowflake',
+            ];
 
             $tableManifestOptions = new OutTableManifestOptions();
             $tableManifestOptions
