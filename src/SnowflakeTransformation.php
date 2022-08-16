@@ -6,6 +6,7 @@ namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\Manifest\ManifestManager;
 use Keboola\Component\UserException;
+use Keboola\Datatype\Definition\Common;
 use Keboola\Datatype\Definition\Exception\InvalidTypeException;
 use Keboola\Datatype\Definition\GenericStorage as GenericDatatype;
 use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
@@ -65,8 +66,8 @@ class SnowflakeTransformation
             }
             // add metadata indicating that this output is snowflake native
             $tableMetadata[] = [
-                'key' => 'KBC.datatype.backend',
-                'value' => 'snowflake',
+                'key' => Common::KBC_METADATA_KEY_BACKEND,
+                'value' => SnowflakeDatatype::METADATA_BACKEND,
             ];
 
             $tableManifestOptions = new OutTableManifestOptions();
