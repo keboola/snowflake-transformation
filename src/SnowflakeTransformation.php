@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\Manifest\ManifestManager;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 use Keboola\Component\UserException;
 use Keboola\Datatype\Definition\Common;
 use Keboola\Datatype\Definition\Exception\InvalidTypeException;
@@ -13,8 +14,8 @@ use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Psr\Log\LoggerInterface;
-use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 use SqlFormatter;
+use Throwable;
 
 class SnowflakeTransformation
 {
@@ -133,7 +134,7 @@ class SnowflakeTransformation
             $this->logger->info(sprintf('Running query "%s".', $this->queryExcerpt($query)));
             try {
                 $this->connection->query($uncommentedQuery);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 $message = sprintf(
                     'Query "%s" in "%s" failed with error: "%s"',
                     $this->queryExcerpt($query),

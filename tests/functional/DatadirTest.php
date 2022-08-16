@@ -167,7 +167,7 @@ class DatadirTest extends AbstractDatadirTestCase
             [
                 'key' => 'KBC.datatype.backend',
                 'value' => 'snowflake',
-            ]
+            ],
         ];
 
         $expectedColumnMetadata = $this->getExpectedColumnMetadata();
