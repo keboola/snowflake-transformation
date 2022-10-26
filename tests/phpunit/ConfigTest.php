@@ -126,6 +126,18 @@ class ConfigTest extends TestCase
         new Config($configArray, $configDefinition);
     }
 
+    public function testDatabaseConfigDoesNotContainUnknownKeys(): void
+    {
+        $configArray = [
+            'authorization' => $this->getDatabaseConfig(),
+        ];
+        $configDefinition = new ConfigDefinition();
+
+        $config = new Config($configArray, $configDefinition);
+
+        self::assertArrayNotHasKey('unknownKey', $config->getDatabaseConfig());
+    }
+
     private function getDatabaseConfig(): array
     {
         return [
@@ -136,6 +148,7 @@ class ConfigTest extends TestCase
                 'schema' => 'xxx',
                 'user' => 'xxx',
                 'password' => 'xxx',
+                'unknownKey' => 'xxx',
             ],
         ];
     }
