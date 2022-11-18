@@ -8,11 +8,14 @@ use Keboola\Component\Manifest\ManifestManager;
 use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 use Keboola\Component\UserException;
 use Keboola\Datatype\Definition\Common;
-use Keboola\Datatype\Definition\Exception\InvalidTypeException;
-use Keboola\Datatype\Definition\GenericStorage as GenericDatatype;
 use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
+use Keboola\TableBackendUtils\Column\ColumnCollection;
+use Keboola\TableBackendUtils\Column\Snowflake\SnowflakeColumn;
+use Keboola\TableBackendUtils\Escaping\Snowflake\SnowflakeQuote;
+use Keboola\TableBackendUtils\Table\Snowflake\SnowflakeTableDefinition;
 use Psr\Log\LoggerInterface;
 use SqlFormatter;
 use Throwable;
@@ -34,37 +37,24 @@ class SnowflakeTransformation
         $this->connection = new Connection($this->databaseConfig);
     }
 
+    /**
+     * @param array<array{source: string}> $tableNames
+     * @param ManifestManager $manifestManager
+     */
     public function createManifestMetadata(array $tableNames, ManifestManager $manifestManager): void
     {
         $tableStructures = $this->getTables($tableNames);
-        foreach ($tableStructures as $tableStructure) {
+        foreach ($tableStructures as $tableDef) {
             $columnsMetadata = (object) [];
-            $columnNames = [];
-            foreach ($tableStructure['columns'] as $column) {
-                $columnNames[] = $column['name'];
-                $datatypeKeys = array_flip(['length', 'nullable']);
-                try {
-                    $datatype = new SnowflakeDatatype(
-                        $column['type'],
-                        array_intersect_key($column, $datatypeKeys)
-                    );
-                } catch (InvalidTypeException $e) {
-                    unset($column['length']);
-                    $datatype = new GenericDatatype(
-                        $column['type'],
-                        array_intersect_key($column, $datatypeKeys)
-                    );
-                }
-                $columnsMetadata->{$column['name']} = $datatype->toMetadata();
+            /** @var SnowflakeColumn $column */
+            foreach ($tableDef->getColumnsDefinitions() as $column) {
+                $columnsMetadata->{$column->getColumnName()} = $column->getColumnDefinition()->toMetadata();
             }
-            unset($tableStructure['columns']);
             $tableMetadata = [];
-            foreach ($tableStructure as $key => $value) {
-                $tableMetadata[] = [
-                    'key' => 'KBC.' . $key,
-                    'value' => $value,
-                ];
-            }
+            $tableMetadata[] = [
+                'key' => 'KBC.name',
+                'value' => $tableDef->getTableName(),
+            ];
             // add metadata indicating that this output is snowflake native
             $tableMetadata[] = [
                 'key' => Common::KBC_METADATA_KEY_BACKEND,
@@ -74,10 +64,10 @@ class SnowflakeTransformation
             $tableManifestOptions = new OutTableManifestOptions();
             $tableManifestOptions
                 ->setMetadata($tableMetadata)
-                ->setColumns($columnNames)
+                ->setColumns($tableDef->getColumnsNames())
                 ->setColumnMetadata($columnsMetadata)
             ;
-            $manifestManager->writeTableManifest($tableStructure['name'], $tableManifestOptions);
+            $manifestManager->writeTableManifest($tableDef->getTableName(), $tableManifestOptions);
         }
     }
 
@@ -172,59 +162,60 @@ class SnowflakeTransformation
         }
     }
 
+    /**
+     * @param  array<array{source: string}> $tables
+     * @return SnowflakeTableDefinition[]
+     */
     private function getTables(array $tables): array
     {
         if (count($tables) === 0) {
             return [];
         }
+
         $sourceTables = array_map(function ($item) {
             return $item['source'];
         }, $tables);
 
-        $nameColumns = [
-            'TABLE_NAME',
-            'COLUMN_NAME',
-            'CHARACTER_MAXIMUM_LENGTH',
-            'NUMERIC_PRECISION',
-            'NUMERIC_SCALE',
-            'IS_NULLABLE',
-            'DATA_TYPE',
-        ];
-        $columnSql = sprintf(
-            'SELECT %s FROM %s WHERE TABLE_NAME IN (%s) AND TABLE_SCHEMA = %s ORDER BY ORDINAL_POSITION',
-            implode(', ', array_map(function ($item) {
-                return QueryBuilder::quoteIdentifier($item);
-            }, $nameColumns)),
-            'information_schema.columns',
-            implode(', ', array_map(function ($item) {
-                return QueryBuilder::quote($item);
-            }, $sourceTables)),
-            QueryBuilder::quote($this->databaseConfig['schema'])
-        );
-        $columns = $this->connection->fetchAll($columnSql);
-
-        $tableDefs = [];
-        foreach ($columns as $column) {
-            if (!isset($tableDefs[$column['TABLE_NAME']])) {
-                $tableDefs[$column['TABLE_NAME']] = [
-                    'name' => $column['TABLE_NAME'],
-                    'columns' => [],
-                ];
+        $defs = [];
+        $schema = $this->databaseConfig['schema'];
+        $missingTables = [];
+        foreach ($sourceTables as $tableName) {
+            try {
+                /** @var array<array{
+                 *     name: string,
+                 *     kind: string,
+                 *     type: string,
+                 *     default: string,
+                 *     'null?': string
+                 * }> $columnsMeta */
+                $columnsMeta = $this->connection->fetchAll((
+                sprintf(
+                    'DESC TABLE %s',
+                    SnowflakeQuote::createQuotedIdentifierFromParts([$schema, $tableName,])
+                )
+                ));
+            } catch (SnowflakeDbAdapterException $e) {
+                $missingTables[] = $tableName;
+                continue;
             }
 
-            $tableDefs[$column['TABLE_NAME']]['columns'][] = [
-                'name' => $column['COLUMN_NAME'],
-                'length' => [
-                    'character_maximum' => $column['CHARACTER_MAXIMUM_LENGTH'],
-                    'numeric_precision' => $column['NUMERIC_PRECISION'],
-                    'numeric_scale' => $column['NUMERIC_SCALE'],
-                ],
-                'nullable' => !(trim($column['IS_NULLABLE']) === 'NO'),
-                'type' => $column['DATA_TYPE'],
-            ];
+            $columns = [];
+
+            foreach ($columnsMeta as $col) {
+                if ($col['kind'] === 'COLUMN') {
+                    $columns[] = SnowflakeColumn::createFromDB($col);
+                }
+            }
+
+            $defs[] = new SnowflakeTableDefinition(
+                $schema,
+                $tableName,
+                false,
+                new ColumnCollection($columns),
+                []
+            );
         }
 
-        $missingTables = array_diff($sourceTables, array_keys($tableDefs));
         if ($missingTables) {
             throw new UserException(
                 sprintf(
@@ -233,7 +224,7 @@ class SnowflakeTransformation
                 )
             );
         }
-        return $tableDefs;
+        return $defs;
     }
 
     private function queryExcerpt(string $query): string
