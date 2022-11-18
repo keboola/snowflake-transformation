@@ -10,6 +10,7 @@ use Keboola\Component\UserException;
 use Keboola\Datatype\Definition\Common;
 use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\TableBackendUtils\Column\ColumnCollection;
@@ -194,7 +195,7 @@ class SnowflakeTransformation
                     SnowflakeQuote::createQuotedIdentifierFromParts([$schema, $tableName,])
                 )
                 ));
-            } catch (SnowflakeDbAdapterException $e) {
+            } catch (RuntimeException $e) {
                 $missingTables[] = $tableName;
                 continue;
             }
