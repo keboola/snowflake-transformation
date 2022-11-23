@@ -581,7 +581,7 @@ class DatadirTest extends AbstractDatadirTestCase
             'NAME' => [
                 [
                     'key' => 'KBC.datatype.type',
-                    'value' => 'TEXT',
+                    'value' => 'VARCHAR',
                 ],
                 [
                     'key' => 'KBC.datatype.nullable',
@@ -599,7 +599,7 @@ class DatadirTest extends AbstractDatadirTestCase
             'NOTNULL' => [
                 [
                     'key' => 'KBC.datatype.type',
-                    'value' => 'TEXT',
+                    'value' => 'VARCHAR',
                 ],
                 [
                     'key' => 'KBC.datatype.nullable',

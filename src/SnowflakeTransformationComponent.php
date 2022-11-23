@@ -21,8 +21,10 @@ class SnowflakeTransformationComponent extends BaseComponent
 
         $snowflakeTransformation->processBlocks($config->getBlocks());
 
+        /** @var array<array{source: string}> $tables */
+        $tables = $config->getExpectedOutputTables();
         $snowflakeTransformation->createManifestMetadata(
-            $config->getExpectedOutputTables(),
+            $tables,
             new ManifestManager($this->getDataDir())
         );
     }
