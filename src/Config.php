@@ -10,6 +10,8 @@ use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 
 class Config extends BaseConfig
 {
+    private const SNOWFLAKE_APPLICATION = 'Keboola_Connection';
+
     public function getQueryTimeout(): int
     {
         return $this->getIntValue(['parameters', 'query_timeout']);
@@ -34,6 +36,7 @@ class Config extends BaseConfig
                 'schema',
             ], true));
             $databaseConfig['clientSessionKeepAlive'] = true;
+            $databaseConfig['application'] = self::SNOWFLAKE_APPLICATION;
 
             return $databaseConfig;
         } catch (InvalidArgumentException $exception) {
