@@ -10,20 +10,22 @@ use Keboola\SnowflakeTransformation\Exception\ApplicationException;
 
 class Config extends BaseConfig
 {
+    private const SNOWFLAKE_APPLICATION = 'Keboola_Connection';
+
     public function getQueryTimeout(): int
     {
-        return (int) $this->getValue(['parameters', 'query_timeout']);
+        return $this->getIntValue(['parameters', 'query_timeout']);
     }
 
     public function getBlocks(): array
     {
-        return $this->getValue(['parameters', 'blocks']);
+        return $this->getArrayValue(['parameters', 'blocks']);
     }
 
     public function getDatabaseConfig(): array
     {
         try {
-            $databaseConfig = $this->getValue(['authorization', 'workspace']);
+            $databaseConfig = $this->getArrayValue(['authorization', 'workspace']);
             $databaseConfig = array_intersect_key($databaseConfig, array_fill_keys([
                 'host',
                 'port',
@@ -34,6 +36,7 @@ class Config extends BaseConfig
                 'schema',
             ], true));
             $databaseConfig['clientSessionKeepAlive'] = true;
+            $databaseConfig['application'] = self::SNOWFLAKE_APPLICATION;
 
             return $databaseConfig;
         } catch (InvalidArgumentException $exception) {

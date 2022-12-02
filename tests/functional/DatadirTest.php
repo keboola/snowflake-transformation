@@ -155,7 +155,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($config);
 
         $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/testmetadata.manifest';
-        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
+        $manifestData = (array) json_decode((string) file_get_contents($manifestFilePath), true);
         $this->assertArrayHasKey('metadata', $manifestData);
         $this->assertArrayHasKey('column_metadata', $manifestData);
 
@@ -222,7 +222,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($config);
 
         $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/TABLES.manifest';
-        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
+        $manifestData = (array) json_decode((string) file_get_contents($manifestFilePath), true);
         $this->assertArrayHasKey('metadata', $manifestData);
         $this->assertArrayHasKey('column_metadata', $manifestData);
 
@@ -510,7 +510,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($config);
 
         $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/accounts.manifest';
-        $manifestData = json_decode((string) file_get_contents($manifestFilePath), true);
+        $manifestData = (array) json_decode((string) file_get_contents($manifestFilePath), true);
 
         $this->assertEquals(['1234'], $manifestData['columns']);
     }
@@ -533,7 +533,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         file_put_contents($tempDatadir->getTmpFolder() . '/config.json', json_encode($config));
 
-        $process = $this->runScript($tempDatadir->getTmpFolder());
+        $process = $this->runScript($tempDatadir->getTmpFolder(), (string) getenv('KBC_RUNID'));
 
         $this->assertMatchesSpecification($specification, $process, $tempDatadir->getTmpFolder());
 
