@@ -533,7 +533,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         file_put_contents($tempDatadir->getTmpFolder() . '/config.json', json_encode($config));
 
-        $process = $this->runScript($tempDatadir->getTmpFolder());
+        $process = $this->runScript($tempDatadir->getTmpFolder(), (string) getenv('KBC_RUNID'));
 
         $this->assertMatchesSpecification($specification, $process, $tempDatadir->getTmpFolder());
 
