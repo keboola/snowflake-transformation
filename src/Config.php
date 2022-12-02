@@ -12,18 +12,18 @@ class Config extends BaseConfig
 {
     public function getQueryTimeout(): int
     {
-        return (int) $this->getValue(['parameters', 'query_timeout']);
+        return $this->getIntValue(['parameters', 'query_timeout']);
     }
 
     public function getBlocks(): array
     {
-        return $this->getValue(['parameters', 'blocks']);
+        return $this->getArrayValue(['parameters', 'blocks']);
     }
 
     public function getDatabaseConfig(): array
     {
         try {
-            $databaseConfig = $this->getValue(['authorization', 'workspace']);
+            $databaseConfig = $this->getArrayValue(['authorization', 'workspace']);
             $databaseConfig = array_intersect_key($databaseConfig, array_fill_keys([
                 'host',
                 'port',

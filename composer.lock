@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e8ad661013c39674409223fda9ec188d",
+    "content-hash": "03c8266c4f67294d21a4149a341e4158",
     "packages": [
         {
             "name": "brick/math",
@@ -1075,30 +1075,30 @@
         },
         {
             "name": "keboola/db-adapter-snowflake",
-            "version": "1.0.5",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-adapter-snowflake.git",
-                "reference": "e88c894a4bb4b75723cd7275a43760ec0f354a7c"
+                "reference": "9b212dda0de67915785c63fc24edef6f0c10e0f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-adapter-snowflake/zipball/e88c894a4bb4b75723cd7275a43760ec0f354a7c",
-                "reference": "e88c894a4bb4b75723cd7275a43760ec0f354a7c",
+                "url": "https://api.github.com/repos/keboola/db-adapter-snowflake/zipball/9b212dda0de67915785c63fc24edef6f0c10e0f9",
+                "reference": "9b212dda0de67915785c63fc24edef6f0c10e0f9",
                 "shasum": ""
             },
             "require": {
                 "ext-odbc": "*",
-                "php": "^7.1"
+                "php": "^8.0"
             },
             "require-dev": {
-                "jakub-onderka/php-parallel-lint": "^1.0",
                 "keboola/coding-standard": ">=7.0.2",
-                "keboola/datadir-tests": "^2.0",
-                "keboola/php-temp": "^1.0",
-                "phpstan/phpstan-shim": "^0.10.6",
-                "phpunit/phpunit": "^7.0",
-                "symfony/process": "^4.0"
+                "keboola/datadir-tests": "^5.3",
+                "keboola/php-temp": "^2.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3",
+                "phpstan/phpstan": "^1.8",
+                "phpunit/phpunit": "^9.5",
+                "symfony/process": "^5.4"
             },
             "type": "library",
             "autoload": {
@@ -1111,42 +1111,40 @@
                 "MIT"
             ],
             "support": {
-                "issues": "https://github.com/keboola/db-adapter-snowflake/issues",
-                "source": "https://github.com/keboola/db-adapter-snowflake/tree/master"
+                "source": "https://github.com/keboola/db-adapter-snowflake/tree/1.3.0"
             },
-            "time": "2020-03-06T08:52:55+00:00"
+            "time": "2022-12-02T09:01:15+00:00"
         },
         {
             "name": "keboola/php-component",
-            "version": "8.3.0",
+            "version": "9.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-component.git",
-                "reference": "2791e6eb346dc25a3a82818fd8dbebddc8eeb79b"
+                "reference": "6a4a473b264ba549a24342f1ab79dca4f4adf2ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-component/zipball/2791e6eb346dc25a3a82818fd8dbebddc8eeb79b",
-                "reference": "2791e6eb346dc25a3a82818fd8dbebddc8eeb79b",
+                "url": "https://api.github.com/repos/keboola/php-component/zipball/6a4a473b264ba549a24342f1ab79dca4f4adf2ab",
+                "reference": "6a4a473b264ba549a24342f1ab79dca4f4adf2ab",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "keboola/common-exceptions": "^1.0",
-                "monolog/monolog": "^2.0",
-                "php": "^7.3",
-                "symfony/config": "^5.0",
-                "symfony/filesystem": "^5.0",
-                "symfony/finder": "^5.0",
-                "symfony/serializer": "^5.0"
+                "keboola/common-exceptions": "^1.2",
+                "monolog/monolog": "^2.3",
+                "php": "^7.4|^8.0",
+                "symfony/config": "^5.4|^6.0",
+                "symfony/filesystem": "^5.4|^6.0",
+                "symfony/finder": "^5.4|^6.0",
+                "symfony/serializer": "^5.4|^6.0"
             },
             "require-dev": {
                 "devedge/sami-github": "^1.0",
-                "jakub-onderka/php-parallel-lint": "^1.0",
-                "keboola/coding-standard": ">=7.0.2",
+                "keboola/coding-standard": "^14.0",
                 "keboola/php-temp": "^2.0",
-                "phpstan/phpstan": "^0.12.14",
-                "phpunit/phpunit": "^9.0"
+                "phpstan/phpstan": "^1.4",
+                "phpunit/phpunit": "^9.5"
             },
             "type": "project",
             "autoload": {
@@ -1172,9 +1170,9 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-component/issues",
-                "source": "https://github.com/keboola/php-component/tree/8.3.0"
+                "source": "https://github.com/keboola/php-component/tree/9.3.0"
             },
-            "time": "2021-03-12T08:12:05+00:00"
+            "time": "2022-11-11T11:13:53+00:00"
         },
         {
             "name": "keboola/php-datatypes",
@@ -3004,59 +3002,6 @@
             "time": "2022-03-03T08:28:38+00:00"
         },
         {
-            "name": "jakub-onderka/php-parallel-lint",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JakubOnderka/PHP-Parallel-Lint.git",
-                "reference": "04fbd3f5fb1c83f08724aa58a23db90bd9086ee8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JakubOnderka/PHP-Parallel-Lint/zipball/04fbd3f5fb1c83f08724aa58a23db90bd9086ee8",
-                "reference": "04fbd3f5fb1c83f08724aa58a23db90bd9086ee8",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "jakub-onderka/php-console-highlighter": "~0.3",
-                "nette/tester": "~1.3",
-                "squizlabs/php_codesniffer": "~2.7"
-            },
-            "suggest": {
-                "jakub-onderka/php-console-highlighter": "Highlight syntax in code snippet"
-            },
-            "bin": [
-                "parallel-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "./"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Jakub Onderka",
-                    "email": "ahoj@jakubonderka.cz"
-                }
-            ],
-            "description": "This tool check syntax of PHP files about 20x faster than serial check.",
-            "homepage": "https://github.com/JakubOnderka/PHP-Parallel-Lint",
-            "support": {
-                "issues": "https://github.com/JakubOnderka/PHP-Parallel-Lint/issues",
-                "source": "https://github.com/JakubOnderka/PHP-Parallel-Lint/tree/master"
-            },
-            "abandoned": "php-parallel-lint/php-parallel-lint",
-            "time": "2018-02-24T15:31:20+00:00"
-        },
-        {
             "name": "keboola/coding-standard",
             "version": "14.0.0",
             "source": {
@@ -3088,30 +3033,31 @@
         },
         {
             "name": "keboola/datadir-tests",
-            "version": "4.0.2",
+            "version": "5.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/datadir-tests.git",
-                "reference": "b01856c771760331b50a082f8b6cb2557632c5bc"
+                "reference": "43e21450444f2c3279835c6ef76cd539d63e43db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/datadir-tests/zipball/b01856c771760331b50a082f8b6cb2557632c5bc",
-                "reference": "b01856c771760331b50a082f8b6cb2557632c5bc",
+                "url": "https://api.github.com/repos/keboola/datadir-tests/zipball/43e21450444f2c3279835c6ef76cd539d63e43db",
+                "reference": "43e21450444f2c3279835c6ef76cd539d63e43db",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
                 "keboola/php-temp": "^2.0",
-                "php": "^7.3",
-                "phpunit/phpunit": "^9.0",
-                "symfony/filesystem": "^5.0",
-                "symfony/finder": "^5.0",
-                "symfony/process": "^5.0"
+                "php": "^7.4|^8.0",
+                "phpunit/phpunit": "^9.5",
+                "symfony/filesystem": "^5.0|^6.0",
+                "symfony/finder": "^5.0|^6.0",
+                "symfony/process": "^5.0|^6.0"
             },
             "require-dev": {
-                "jakub-onderka/php-parallel-lint": "^1.0",
-                "keboola/coding-standard": "^9.0",
-                "phpstan/phpstan": "^0.12.14"
+                "keboola/coding-standard": "^13.0",
+                "php-parallel-lint/php-parallel-lint": "^1.3",
+                "phpstan/phpstan": "^1.4"
             },
             "type": "library",
             "autoload": {
@@ -3126,9 +3072,9 @@
             "description": "Tool for functional testing of Keboola Connection components",
             "support": {
                 "issues": "https://github.com/keboola/datadir-tests/issues",
-                "source": "https://github.com/keboola/datadir-tests/tree/master"
+                "source": "https://github.com/keboola/datadir-tests/tree/5.5.1"
             },
-            "time": "2020-03-19T12:08:12+00:00"
+            "time": "2022-11-10T15:36:28+00:00"
         },
         {
             "name": "keboola/php-temp",
@@ -3409,6 +3355,63 @@
             "time": "2022-02-21T01:04:05+00:00"
         },
         {
+            "name": "php-parallel-lint/php-parallel-lint",
+            "version": "v1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-parallel-lint/PHP-Parallel-Lint.git",
+                "reference": "6483c9832e71973ed29cf71bd6b3f4fde438a9de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-parallel-lint/PHP-Parallel-Lint/zipball/6483c9832e71973ed29cf71bd6b3f4fde438a9de",
+                "reference": "6483c9832e71973ed29cf71bd6b3f4fde438a9de",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=5.3.0"
+            },
+            "replace": {
+                "grogy/php-parallel-lint": "*",
+                "jakub-onderka/php-parallel-lint": "*"
+            },
+            "require-dev": {
+                "nette/tester": "^1.3 || ^2.0",
+                "php-parallel-lint/php-console-highlighter": "0.* || ^1.0",
+                "squizlabs/php_codesniffer": "^3.6"
+            },
+            "suggest": {
+                "php-parallel-lint/php-console-highlighter": "Highlight syntax in code snippet"
+            },
+            "bin": [
+                "parallel-lint"
+            ],
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "./src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jakub Onderka",
+                    "email": "ahoj@jakubonderka.cz"
+                }
+            ],
+            "description": "This tool check syntax of PHP files about 20x faster than serial check.",
+            "homepage": "https://github.com/php-parallel-lint/PHP-Parallel-Lint",
+            "support": {
+                "issues": "https://github.com/php-parallel-lint/PHP-Parallel-Lint/issues",
+                "source": "https://github.com/php-parallel-lint/PHP-Parallel-Lint/tree/v1.3.2"
+            },
+            "time": "2022-02-21T12:50:22+00:00"
+        },
+        {
             "name": "phpdocumentor/reflection-common",
             "version": "2.2.0",
             "source": {
@@ -3682,20 +3685,20 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.99",
+            "version": "1.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7"
+                "reference": "d6fdf01c53978b6429f1393ba4afeca39cc68afa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b4d40f1d759942f523be267a1bab6884f46ca3f7",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d6fdf01c53978b6429f1393ba4afeca39cc68afa",
+                "reference": "d6fdf01c53978b6429f1393ba4afeca39cc68afa",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1|^8.0"
+                "php": "^7.2|^8.0"
             },
             "conflict": {
                 "phpstan/phpstan-shim": "*"
@@ -3705,11 +3708,6 @@
                 "phpstan.phar"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.12-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -3720,9 +3718,13 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.99"
+                "source": "https://github.com/phpstan/phpstan/tree/1.9.2"
             },
             "funding": [
                 {
@@ -3734,15 +3736,11 @@
                     "type": "github"
                 },
                 {
-                    "url": "https://www.patreon.com/phpstan",
-                    "type": "patreon"
-                },
-                {
                     "url": "https://tidelift.com/funding/github/packagist/phpstan/phpstan",
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-12T20:09:55+00:00"
+            "time": "2022-11-10T09:56:11+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -5424,7 +5422,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.4",
+        "php": "^8.1",
         "ext-json": "*",
         "ext-mbstring": "*"
     },
