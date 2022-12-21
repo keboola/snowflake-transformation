@@ -652,4 +652,87 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ];
     }
+
+    public function testAbortTransformationWithWriteAlways(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'accounts',
+                            'destination' => 'out.c-my.accounts',
+                            'write_always' => true,
+                        ],
+                        [
+                            'source' => 'accounts2',
+                            'destination' => 'out.c-my.accounts2',
+                            'write_always' => false,
+                        ],
+                        [
+                            'source' => 'accounts3',
+                            'destination' => 'out.c-my.accounts3',
+                        ],
+                    ],
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS accounts;',
+                                    'CREATE TABLE accounts ("account_id" varchar);',
+                                    'INSERT INTO accounts VALUES (\'123\');',
+                                ],
+                            ],
+                            [
+                                'name' => 'second code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS accounts2;',
+                                    'CREATE TABLE accounts2 ("account_id" varchar);',
+                                    'INSERT INTO accounts2 VALUES (\'123\');',
+                                ],
+                            ],
+                            [
+                                'name' => 'third code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS accounts3;',
+                                    'CREATE TABLE accounts3 ("account_id" varchar);',
+                                    'INSERT INTO accounts3 VALUES (\'123\');',
+                                ],
+                            ],
+                            [
+                                'name' => 'abort code',
+                                'script' => [
+                                    'SET ABORT_TRANSFORMATION=\'Abort Me Please\'',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $process = $this->runAppWithConfig(
+            $config,
+            1,
+            null,
+            "Transformation aborted with message \"Abort Me Please\"\n"
+        );
+
+        $this->assertStringContainsString('Checking user termination', $process->getOutput());
+
+        $manifestFilePath = sprintf('%s/out/tables/accounts.manifest', $this->temp->getTmpFolder());
+        $manifestData = (array) json_decode((string) file_get_contents($manifestFilePath), true);
+        $this->assertArrayHasKey('metadata', $manifestData);
+        $this->assertArrayHasKey('column_metadata', $manifestData);
+
+        $this->assertFileDoesNotExist(sprintf('%s/out/tables/accounts2.manifest', $this->temp->getTmpFolder()));
+        $this->assertFileDoesNotExist(sprintf('%s/out/tables/accounts3.manifest', $this->temp->getTmpFolder()));
+    }
 }
