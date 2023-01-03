@@ -11,7 +11,6 @@ use Keboola\Datatype\Definition\Common;
 use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
-use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use Keboola\TableBackendUtils\Column\ColumnCollection;
 use Keboola\TableBackendUtils\Column\Snowflake\SnowflakeColumn;
@@ -31,6 +30,10 @@ class SnowflakeTransformation
 
     private array $databaseConfig;
 
+    /**
+     * @throws \Keboola\SnowflakeTransformation\Exception\ApplicationException
+     * @throws \Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException
+     */
     public function __construct(Config $config, LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -39,12 +42,17 @@ class SnowflakeTransformation
     }
 
     /**
-     * @param array<array{source: string}> $tableNames
+     * @throws \Keboola\Component\Manifest\ManifestManager\Options\OptionsValidationException
+     * @throws \Keboola\Component\UserException
+     * @param array<array{source: string, write_always?: bool}> $tableNames
      * @param ManifestManager $manifestManager
      */
-    public function createManifestMetadata(array $tableNames, ManifestManager $manifestManager): void
-    {
-        $tableStructures = $this->getTables($tableNames);
+    public function createManifestMetadata(
+        array $tableNames,
+        ManifestManager $manifestManager,
+        bool $transformationFailed = false
+    ): void {
+        $tableStructures = $this->getTables($tableNames, $transformationFailed);
         foreach ($tableStructures as $tableDef) {
             $columnsMetadata = (object) [];
             /** @var SnowflakeColumn $column */
@@ -72,6 +80,9 @@ class SnowflakeTransformation
         }
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public function setSession(Config $config): void
     {
         $sessionVariables = [];
@@ -92,6 +103,9 @@ class SnowflakeTransformation
         $this->executeQueries('alter session', [$query]);
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public function processBlocks(array $blocks): void
     {
         foreach ($blocks as $block) {
@@ -100,6 +114,9 @@ class SnowflakeTransformation
         }
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public function processCodes(array $codes): void
     {
         foreach ($codes as $code) {
@@ -108,6 +125,9 @@ class SnowflakeTransformation
         }
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     public function executeQueries(string $blockName, array $queries): void
     {
         foreach ($queries as $query) {
@@ -142,6 +162,9 @@ class SnowflakeTransformation
         }
     }
 
+    /**
+     * @throws \Keboola\Component\UserException
+     */
     protected function checkUserTermination(): void
     {
         $this->logger->info('Checking user termination');
@@ -164,18 +187,23 @@ class SnowflakeTransformation
     }
 
     /**
-     * @param  array<array{source: string}> $tables
+     * @throws \Keboola\Component\UserException
+     * @param array<array{source: string, write_always?: bool}> $tables
      * @return SnowflakeTableDefinition[]
      */
-    private function getTables(array $tables): array
+    private function getTables(array $tables, bool $transformationFailed): array
     {
         if (count($tables) === 0) {
             return [];
         }
 
-        $sourceTables = array_map(function ($item) {
-            return $item['source'];
-        }, $tables);
+        if ($transformationFailed) {
+            $tables = array_filter($tables, function ($item) {
+                return isset($item['write_always']) && $item['write_always'] === true;
+            });
+        }
+
+        $sourceTables = array_column($tables, 'source');
 
         $defs = [];
         $schema = $this->databaseConfig['schema'];
