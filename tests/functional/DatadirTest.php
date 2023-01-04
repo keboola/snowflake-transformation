@@ -735,4 +735,42 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertFileDoesNotExist(sprintf('%s/out/tables/accounts2.manifest', $this->temp->getTmpFolder()));
         $this->assertFileDoesNotExist(sprintf('%s/out/tables/accounts3.manifest', $this->temp->getTmpFolder()));
     }
+
+    public function testEnvVars(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $configArray = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "envvars"',
+                                    'CREATE TABLE IF NOT EXISTS "envvars" ("name" VARCHAR(200), "value" VARCHAR(200));',
+                                    'INSERT INTO "envvars" VALUES (\'KBC_RUNID\', (SELECT $KBC_RUNID))',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($configArray);
+        $connection = new Connection($configArray['authorization']['workspace']);
+        $insertedData = $connection->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('envvars'))
+        );
+        $this->assertEquals($insertedData, [
+            [
+                'name' => 'KBC_RUNID',
+                'value' => getenv('KBC_RUNID'),
+            ],
+        ]);
+    }
 }

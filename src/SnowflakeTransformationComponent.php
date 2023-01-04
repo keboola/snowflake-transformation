@@ -26,6 +26,7 @@ class SnowflakeTransformationComponent extends BaseComponent
         $snowflakeTransformation = new SnowflakeTransformation($config, $this->getLogger());
 
         $snowflakeTransformation->setSession($config);
+        $snowflakeTransformation->setKbcEnvVars();
 
         try {
             $snowflakeTransformation->processBlocks($config->getBlocks());

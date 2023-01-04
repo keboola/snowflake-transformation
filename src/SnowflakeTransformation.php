@@ -263,4 +263,36 @@ class SnowflakeTransformation
         }
         return $query;
     }
+
+    /**
+     * @throws \Keboola\Component\UserException
+     */
+    public function setKbcEnvVars(): void
+    {
+        $kbcEnvVars = [
+            'KBC_RUNID',
+            'KBC_PROJECTID',
+            'KBC_STACKID',
+            'KBC_CONFIGID',
+            'KBC_COMPONENTID',
+            'KBC_CONFIGROWID',
+            'KBC_BRANCHID',
+        ];
+
+        $variables = [];
+        foreach ($kbcEnvVars as $kbcEnvVar) {
+            $value = getenv($kbcEnvVar);
+            if ($value) {
+                $variables[$kbcEnvVar] = sprintf("'%s'", $value);
+            }
+        }
+
+        $query = sprintf(
+            'SET (%s) = (%s);',
+            implode(', ', array_keys($variables)),
+            implode(', ', array_values($variables))
+        );
+
+        $this->executeQueries('set variables', [$query]);
+    }
 }
