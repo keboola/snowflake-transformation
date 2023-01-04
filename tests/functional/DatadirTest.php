@@ -441,7 +441,7 @@ class DatadirTest extends AbstractDatadirTestCase
         ];
         $process = $this->runAppWithConfig($config);
 
-        $this->assertEquals(1, substr_count($process->getOutput(), 'Running query'));
+        $this->assertEquals(2, substr_count($process->getOutput(), 'Running query'));
     }
 
     public function testCastOperatorQuery(): void
