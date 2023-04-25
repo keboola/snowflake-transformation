@@ -8,6 +8,7 @@ use Keboola\DatadirTests\AbstractDatadirTestCase;
 use Keboola\DatadirTests\DatadirTestSpecification;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\Process\Process;
 
 class DatadirTest extends AbstractDatadirTestCase
@@ -471,6 +472,46 @@ class DatadirTest extends AbstractDatadirTestCase
         // phpcs:enable
 
         $this->runAppWithConfig($config);
+    }
+
+    public function testCollateVarchar(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "accounts";',
+                                    'CREATE TABLE "accounts" ("account_id" varchar(255) COLLATE \'cz\');',
+                                    'INSERT INTO "accounts" VALUES (\'123\');',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'accounts',
+                            'destination' => 'out.c-my.accounts',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $process = $this->runAppWithConfig($config);
+
+        Assert::assertEquals(0, $process->getExitCode());
     }
 
     public function testIntColumn(): void
