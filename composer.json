@@ -18,7 +18,7 @@
         "keboola/db-adapter-snowflake": "^1.3",
         "keboola/php-component": "^9.3",
         "keboola/php-datatypes": "^6.3",
-        "keboola/table-backend-utils": "^1.8",
+        "keboola/table-backend-utils": "^2.0",
         "symfony/config": "^5.0"
     },
     "require-dev": {
