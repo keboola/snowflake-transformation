@@ -3,8 +3,8 @@ FROM php:8.1-cli
 ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG SNOWFLAKE_ODBC_VERSION=2.22.5
-ARG SNOWFLAKE_GPG_KEY=37C7086698CB005C
+ARG SNOWFLAKE_ODBC_VERSION=2.25.9
+ARG SNOWFLAKE_GPG_KEY=630D9F3CAB551AF3
 
 ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
@@ -65,7 +65,8 @@ RUN mkdir -p ~/.gnupg \
     && gpg --export $SNOWFLAKE_GPG_KEY > /usr/share/debsig/keyrings/$SNOWFLAKE_GPG_KEY/debsig.gpg \
     && debsig-verify /tmp/snowflake-odbc.deb \
     && gpg --batch --delete-key --yes $SNOWFLAKE_GPG_KEY \
-    && dpkg -i /tmp/snowflake-odbc.deb
+    && dpkg -i /tmp/snowflake-odbc.deb \
+    && rm /tmp/snowflake-odbc.deb
 
 ## Composer - deps always cached unless changed
 # First copy only composer files
