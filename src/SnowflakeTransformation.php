@@ -9,6 +9,7 @@ use Keboola\Component\Manifest\ManifestManager\Options\OutTable\ManifestOptions;
 use Keboola\Component\Manifest\ManifestManager\Options\OutTable\ManifestOptionsSchema;
 use Keboola\Component\UserException;
 use Keboola\Datatype\Definition\Common;
+use Keboola\Datatype\Definition\Snowflake;
 use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
 use Keboola\SnowflakeDbAdapter\Connection;
 use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
@@ -56,19 +57,16 @@ class SnowflakeTransformation
     ): void {
         $tableStructures = $this->getTables($tableNames, $transformationFailed);
         foreach ($tableStructures as $tableDef) {
-            $columnsMetadata = (object) [];
             $schema = [];
             $primaryKeysNames = $tableDef->getPrimaryKeysNames();
 
             /** @var SnowflakeColumn $column */
             foreach ($tableDef->getColumnsDefinitions() as $column) {
-                $columnsMetadata->{$column->getColumnName()} = $column->getColumnDefinition()->toMetadata();
-
                 $dataTypes = [
                     'base' => [
                         'type' => $column->getColumnDefinition()->getBasetype(),
                     ],
-                    'snowflake' => [
+                    Snowflake::METADATA_BACKEND => [
                         'type' => $column->getColumnDefinition()->getType(),
                     ],
                 ];
@@ -248,6 +246,7 @@ class SnowflakeTransformation
                  *     kind: string,
                  *     type: string,
                  *     default: string,
+                 *     'primary key': string,
                  *     'null?': string
                  * }> $columnsMeta */
                 $columnsMeta = $this->connection->fetchAll((
@@ -262,10 +261,15 @@ class SnowflakeTransformation
             }
 
             $columns = [];
+            $primaryKeysNames = [];
 
             foreach ($columnsMeta as $col) {
                 if ($col['kind'] === 'COLUMN') {
                     $columns[] = SnowflakeColumn::createFromDB($col);
+
+                    if ($col['primary key'] === 'Y') {
+                        $primaryKeysNames[] = $col['name'];
+                    }
                 }
             }
 
@@ -274,7 +278,7 @@ class SnowflakeTransformation
                 $tableName,
                 false,
                 new ColumnCollection($columns),
-                [],
+                $primaryKeysNames,
             );
         }
 

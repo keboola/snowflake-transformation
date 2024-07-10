@@ -144,7 +144,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "testmetadata";',
-                                    'create table "testmetadata" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                    'create table "testmetadata" (id int AUTOINCREMENT PRIMARY KEY, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
                                 ],
                             ],
                         ],
@@ -212,7 +212,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "testmetadata";',
-                                    'create table "testmetadata" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                    'create table "testmetadata" (id int AUTOINCREMENT PRIMARY KEY, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
                                 ],
                             ],
                         ],
@@ -241,16 +241,18 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $expectedSchema = [
             [
-                'nullable' => true,
-                'primary_key' => false,
+                'nullable' => false,
+                'primary_key' => true,
                 'metadata' => [],
                 'name' => 'ID',
                 'data_type' => [
                     'base' => [
+                        'default' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
                         'length' => '38,0',
                         'type' => 'NUMERIC',
                     ],
                     'snowflake' => [
+                        'default' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
                         'length' => '38,0',
                         'type' => 'NUMBER',
                     ],
@@ -350,7 +352,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "TABLES";',
-                                    'create table "TABLES" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                    'create table "TABLES" (id int AUTOINCREMENT PRIMARY KEY, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
                                 ],
                             ],
                         ],
@@ -744,7 +746,7 @@ class DatadirTest extends AbstractDatadirTestCase
             'ID' => [
                 [
                     'key' => 'KBC.datatype.nullable',
-                    'value' => true,
+                    'value' => false,
                 ],
                 [
                     'key' => 'KBC.datatype.basetype',
@@ -753,6 +755,10 @@ class DatadirTest extends AbstractDatadirTestCase
                 [
                     'key' => 'KBC.datatype.length',
                     'value' => '38,0',
+                ],
+                [
+                    'key' => 'KBC.datatype.default',
+                    'value' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
                 ],
                 [
                     'key' => 'KBC.datatype.type',
