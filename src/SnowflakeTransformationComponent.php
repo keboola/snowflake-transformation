@@ -34,7 +34,8 @@ class SnowflakeTransformationComponent extends BaseComponent
             $snowflakeTransformation->createManifestMetadata(
                 $config->getExpectedOutputTables(),
                 new ManifestManager($this->getDataDir()),
-                true
+                $this->config->getDataTypeSupport()->usingLegacyManifest(),
+                true,
             );
             throw $e;
         }
@@ -44,6 +45,7 @@ class SnowflakeTransformationComponent extends BaseComponent
         $snowflakeTransformation->createManifestMetadata(
             $tables,
             new ManifestManager($this->getDataDir()),
+            $this->config->getDataTypeSupport()->usingLegacyManifest(),
         );
     }
 

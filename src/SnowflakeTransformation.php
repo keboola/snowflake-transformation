@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeTransformation;
 
 use Keboola\Component\Manifest\ManifestManager;
-use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTable\ManifestOptions;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTable\ManifestOptionsSchema;
 use Keboola\Component\UserException;
 use Keboola\Datatype\Definition\Common;
 use Keboola\Datatype\Definition\Snowflake as SnowflakeDatatype;
@@ -50,33 +51,65 @@ class SnowflakeTransformation
     public function createManifestMetadata(
         array $tableNames,
         ManifestManager $manifestManager,
-        bool $transformationFailed = false
+        bool $usingLegacyManifest,
+        bool $transformationFailed = false,
     ): void {
         $tableStructures = $this->getTables($tableNames, $transformationFailed);
         foreach ($tableStructures as $tableDef) {
             $columnsMetadata = (object) [];
+            $schema = [];
+            $primaryKeysNames = $tableDef->getPrimaryKeysNames();
+
             /** @var SnowflakeColumn $column */
             foreach ($tableDef->getColumnsDefinitions() as $column) {
                 $columnsMetadata->{$column->getColumnName()} = $column->getColumnDefinition()->toMetadata();
+
+                $dataTypes = [
+                    'base' => [
+                        'type' => $column->getColumnDefinition()->getBasetype(),
+                    ],
+                    'snowflake' => [
+                        'type' => $column->getColumnDefinition()->getType(),
+                    ],
+                ];
+
+                if ($column->getColumnDefinition()->getLength() !== null) {
+                    $dataTypes['base']['length'] = $column->getColumnDefinition()->getLength();
+                    $dataTypes['snowflake']['length'] = $column->getColumnDefinition()->getLength();
+                }
+
+                if ($column->getColumnDefinition()->getDefault() !== null) {
+                    $dataTypes['base']['default'] = $column->getColumnDefinition()->getDefault();
+                    $dataTypes['snowflake']['default'] = $column->getColumnDefinition()->getDefault();
+                }
+
+                $schema[] = new ManifestOptionsSchema(
+                    $column->getColumnName(),
+                    $dataTypes,
+                    $column->getColumnDefinition()->isNullable(),
+                    in_array($column->getColumnName(), $primaryKeysNames, true),
+                    null,
+                    [],
+                );
             }
-            $tableMetadata = [];
-            $tableMetadata[] = [
-                'key' => 'KBC.name',
-                'value' => $tableDef->getTableName(),
-            ];
-            // add metadata indicating that this output is snowflake native
-            $tableMetadata[] = [
-                'key' => Common::KBC_METADATA_KEY_BACKEND,
-                'value' => SnowflakeDatatype::METADATA_BACKEND,
+
+            $tableMetadata = [
+                'KBC.name' => $tableDef->getTableName(),
+                Common::KBC_METADATA_KEY_BACKEND => SnowflakeDatatype::METADATA_BACKEND,
             ];
 
-            $tableManifestOptions = new OutTableManifestOptions();
+            $tableManifestOptions = new ManifestOptions();
             $tableManifestOptions
-                ->setMetadata($tableMetadata)
-                ->setColumns($tableDef->getColumnsNames())
-                ->setColumnMetadata($columnsMetadata)
+                ->setTableMetadata($tableMetadata)
+                ->setSchema($schema)
+                ->setManifestType(ManifestOptions::MANIFEST_TYPE_OUTPUT)
             ;
-            $manifestManager->writeTableManifest($tableDef->getTableName(), $tableManifestOptions);
+
+            $manifestManager->writeTableManifest(
+                $tableDef->getTableName(),
+                $tableManifestOptions,
+                $usingLegacyManifest,
+            );
         }
     }
 
@@ -95,7 +128,7 @@ class SnowflakeTransformation
                 [
                     $key,
                     $item,
-                ]
+                ],
             );
         });
 
@@ -150,7 +183,7 @@ class SnowflakeTransformation
                     'Query "%s" in "%s" failed with error: "%s"',
                     $this->queryExcerpt($query),
                     $blockName,
-                    $exception->getMessage()
+                    $exception->getMessage(),
                 );
                 throw new UserException($message, 0, $exception);
             }
@@ -171,8 +204,8 @@ class SnowflakeTransformation
         $result = $this->connection->fetchAll(
             sprintf(
                 'SHOW VARIABLES LIKE %s',
-                QueryBuilder::quote(self::ABORT_TRANSFORMATION)
-            )
+                QueryBuilder::quote(self::ABORT_TRANSFORMATION),
+            ),
         );
 
         if (count($result) === 0) {
@@ -181,7 +214,7 @@ class SnowflakeTransformation
 
         if ($result[0]['value'] !== '') {
             throw new UserException(
-                sprintf('Transformation aborted with message "%s"', $result[0]['value'])
+                sprintf('Transformation aborted with message "%s"', $result[0]['value']),
             );
         }
     }
@@ -220,7 +253,7 @@ class SnowflakeTransformation
                 $columnsMeta = $this->connection->fetchAll((
                 sprintf(
                     'DESC TABLE %s',
-                    SnowflakeQuote::createQuotedIdentifierFromParts([$schema, $tableName,])
+                    SnowflakeQuote::createQuotedIdentifierFromParts([$schema, $tableName,]),
                 )
                 ));
             } catch (RuntimeException $e) {
@@ -241,7 +274,7 @@ class SnowflakeTransformation
                 $tableName,
                 false,
                 new ColumnCollection($columns),
-                []
+                [],
             );
         }
 
@@ -249,8 +282,8 @@ class SnowflakeTransformation
             throw new UserException(
                 sprintf(
                     'Tables "%s" specified in output were not created by the transformation.',
-                    implode('", "', $missingTables)
-                )
+                    implode('", "', $missingTables),
+                ),
             );
         }
         return $defs;
@@ -290,7 +323,7 @@ class SnowflakeTransformation
         $query = sprintf(
             'SET (%s) = (%s);',
             implode(', ', array_keys($variables)),
-            implode(', ', array_values($variables))
+            implode(', ', array_values($variables)),
         );
 
         $this->executeQueries('set variables', [$query]);

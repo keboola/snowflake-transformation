@@ -10,6 +10,7 @@ env:
   KBC_DEVELOPERPORTAL_APP: "keboola.snowflake-transformation"
   KBC_DEVELOPERPORTAL_USERNAME: "keboola+github_actions_snowflake_transformation"
   KBC_DEVELOPERPORTAL_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}
+  KBC_DATA_TYPE_SUPPORT: "none"
 
   # Snowflake Credentials
   SNOWFLAKE_HOST: "kebooladev.snowflakecomputing.com"
@@ -92,6 +93,7 @@ jobs:
             -e SNOWFLAKE_USER \
             -e SNOWFLAKE_PASSWORD \
             -e KBC_RUNID \
+            -e KBC_DATA_TYPE_SUPPORT \
             ${{ env.APP_IMAGE }} \
             composer ci
 
