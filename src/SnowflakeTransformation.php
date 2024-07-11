@@ -85,7 +85,7 @@ class SnowflakeTransformation
                     $column->getColumnName(),
                     $dataTypes,
                     $column->getColumnDefinition()->isNullable(),
-                    in_array($column->getColumnName(), $primaryKeysNames, true),
+                    false,
                     null,
                     [],
                 );
@@ -261,15 +261,10 @@ class SnowflakeTransformation
             }
 
             $columns = [];
-            $primaryKeysNames = [];
 
             foreach ($columnsMeta as $col) {
                 if ($col['kind'] === 'COLUMN') {
                     $columns[] = SnowflakeColumn::createFromDB($col);
-
-                    if ($col['primary key'] === 'Y') {
-                        $primaryKeysNames[] = $col['name'];
-                    }
                 }
             }
 
@@ -278,7 +273,7 @@ class SnowflakeTransformation
                 $tableName,
                 false,
                 new ColumnCollection($columns),
-                $primaryKeysNames,
+                [],
             );
         }
 

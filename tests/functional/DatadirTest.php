@@ -242,7 +242,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $expectedSchema = [
             [
                 'nullable' => false,
-                'primary_key' => true,
+                'primary_key' => false,
                 'metadata' => [],
                 'name' => 'ID',
                 'data_type' => [
