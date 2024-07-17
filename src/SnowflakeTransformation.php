@@ -58,7 +58,6 @@ class SnowflakeTransformation
         $tableStructures = $this->getTables($tableNames, $transformationFailed);
         foreach ($tableStructures as $tableDef) {
             $schema = [];
-            $primaryKeysNames = $tableDef->getPrimaryKeysNames();
 
             /** @var SnowflakeColumn $column */
             foreach ($tableDef->getColumnsDefinitions() as $column) {
@@ -72,7 +71,6 @@ class SnowflakeTransformation
                 ];
 
                 if ($column->getColumnDefinition()->getLength() !== null) {
-                    $dataTypes['base']['length'] = $column->getColumnDefinition()->getLength();
                     $dataTypes['snowflake']['length'] = $column->getColumnDefinition()->getLength();
                 }
 

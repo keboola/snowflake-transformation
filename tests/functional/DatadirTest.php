@@ -248,7 +248,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'data_type' => [
                     'base' => [
                         'default' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
-                        'length' => '38,0',
                         'type' => 'NUMERIC',
                     ],
                     'snowflake' => [
@@ -265,7 +264,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'name' => 'NAME',
                 'data_type' => [
                     'base' => [
-                        'length' => '200',
                         'type' => 'STRING',
                     ],
                     'snowflake' => [
@@ -281,7 +279,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'name' => 'NOTNULL',
                 'data_type' => [
                     'base' => [
-                        'length' => '200',
                         'type' => 'STRING',
                     ],
                     'snowflake' => [
@@ -297,7 +294,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'name' => 'NUMERIC',
                 'data_type' => [
                     'base' => [
-                        'length' => '38,0',
                         'type' => 'NUMERIC',
                     ],
                     'snowflake' => [
@@ -313,7 +309,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'name' => 'DECIMAL',
                 'data_type' => [
                     'base' => [
-                        'length' => '10,2',
                         'type' => 'NUMERIC',
                     ],
                     'snowflake' => [
@@ -753,16 +748,16 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'NUMERIC',
                 ],
                 [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '38,0',
-                ],
-                [
                     'key' => 'KBC.datatype.default',
                     'value' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
                 ],
                 [
                     'key' => 'KBC.datatype.type',
                     'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '38,0',
                 ],
             ],
             'NAME' => [
@@ -775,12 +770,12 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'STRING',
                 ],
                 [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '200',
-                ],
-                [
                     'key' => 'KBC.datatype.type',
                     'value' => 'VARCHAR',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '200',
                 ],
             ],
             'NOTNULL' => [
@@ -793,12 +788,12 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'STRING',
                 ],
                 [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '200',
-                ],
-                [
                     'key' => 'KBC.datatype.type',
                     'value' => 'VARCHAR',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '200',
                 ],
             ],
             'DECIMAL' => [
@@ -811,12 +806,12 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'NUMERIC',
                 ],
                 [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '10,2',
-                ],
-                [
                     'key' => 'KBC.datatype.type',
                     'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '10,2',
                 ],
             ],
             'NUMERIC' => [
@@ -829,12 +824,12 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'NUMERIC',
                 ],
                 [
-                    'key' => 'KBC.datatype.length',
-                    'value' => '38,0',
-                ],
-                [
                     'key' => 'KBC.datatype.type',
                     'value' => 'NUMBER',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => '38,0',
                 ],
             ],
         ];
