@@ -41,7 +41,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($configArray);
         $connection = new Connection($configArray['authorization']['workspace']);
         $insertedData = $connection->fetchAll(
-            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('output'))
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('output')),
         );
         $this->assertEquals($insertedData, [
             [
@@ -115,7 +115,7 @@ class DatadirTest extends AbstractDatadirTestCase
             $config,
             1,
             null,
-            $expectedMessage
+            $expectedMessage,
         );
     }
 
@@ -132,6 +132,7 @@ class DatadirTest extends AbstractDatadirTestCase
                             'destination' => 'out.c-my.testmetadata',
                         ],
                     ],
+                    'data_type_support' => 'none',
                 ],
             ],
             'parameters' => [
@@ -143,7 +144,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "testmetadata";',
-                                    'create table "testmetadata" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                    'create table "testmetadata" (id int AUTOINCREMENT PRIMARY KEY, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
                                 ],
                             ],
                         ],
@@ -186,6 +187,141 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertEquals($expectedColumns, $manifestData['columns']);
     }
 
+    public function testManifestMetadataWithAuthoritativeDataTypes(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'testmetadata',
+                            'destination' => 'out.c-my.testmetadata',
+                        ],
+                    ],
+                    'data_type_support' => 'authoritative',
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'drop table if exists "testmetadata";',
+                                    'create table "testmetadata" (id int AUTOINCREMENT PRIMARY KEY, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/testmetadata.manifest';
+        $manifestData = (array) json_decode((string) file_get_contents($manifestFilePath), true);
+        $this->assertArrayHasKey('manifest_type', $manifestData);
+        $this->assertArrayHasKey('table_metadata', $manifestData);
+        $this->assertArrayHasKey('schema', $manifestData);
+
+        $this->assertSame('output', $manifestData['manifest_type']);
+
+        $expectedTableMetadata = [
+            'KBC.name' => 'testmetadata',
+            'KBC.datatype.backend' => 'snowflake',
+        ];
+
+        $this->assertSame($expectedTableMetadata, $manifestData['table_metadata']);
+
+        $expectedSchema = [
+            [
+                'nullable' => false,
+                'primary_key' => false,
+                'metadata' => [],
+                'name' => 'ID',
+                'data_type' => [
+                    'base' => [
+                        'default' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
+                        'type' => 'NUMERIC',
+                    ],
+                    'snowflake' => [
+                        'default' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
+                        'length' => '38,0',
+                        'type' => 'NUMBER',
+                    ],
+                ],
+            ],
+            [
+                'nullable' => true,
+                'primary_key' => false,
+                'metadata' => [],
+                'name' => 'NAME',
+                'data_type' => [
+                    'base' => [
+                        'type' => 'STRING',
+                    ],
+                    'snowflake' => [
+                        'length' => '200',
+                        'type' => 'VARCHAR',
+                    ],
+                ],
+            ],
+            [
+                'nullable' => false,
+                'primary_key' => false,
+                'metadata' => [],
+                'name' => 'NOTNULL',
+                'data_type' => [
+                    'base' => [
+                        'type' => 'STRING',
+                    ],
+                    'snowflake' => [
+                        'length' => '200',
+                        'type' => 'VARCHAR',
+                    ],
+                ],
+            ],
+            [
+                'nullable' => true,
+                'primary_key' => false,
+                'metadata' => [],
+                'name' => 'NUMERIC',
+                'data_type' => [
+                    'base' => [
+                        'type' => 'NUMERIC',
+                    ],
+                    'snowflake' => [
+                        'length' => '38,0',
+                        'type' => 'NUMBER',
+                    ],
+                ],
+            ],
+            [
+                'nullable' => true,
+                'primary_key' => false,
+                'metadata' => [],
+                'name' => 'DECIMAL',
+                'data_type' => [
+                    'base' => [
+                        'type' => 'NUMERIC',
+                    ],
+                    'snowflake' => [
+                        'length' => '10,2',
+                        'type' => 'NUMBER',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expectedSchema, $manifestData['schema']);
+    }
+
     public function testManifestMetadataWithTableNameExistingInAnotherSchema(): void
     {
         // phpcs:disable Generic.Files.LineLength
@@ -199,6 +335,7 @@ class DatadirTest extends AbstractDatadirTestCase
                             'destination' => 'out.c-my.TABLES',
                         ],
                     ],
+                    'data_type_support' => 'none',
                 ],
             ],
             'parameters' => [
@@ -210,7 +347,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                 'name' => 'first code',
                                 'script' => [
                                     'drop table if exists "TABLES";',
-                                    'create table "TABLES" (id int, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
+                                    'create table "TABLES" (id int AUTOINCREMENT PRIMARY KEY, name varchar(200), notnull VARCHAR(200) NOT NULL, numeric NUMERIC, decimal DECIMAL(10,2));',
                                 ],
                             ],
                         ],
@@ -276,7 +413,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $process = $this->runAppWithConfig(
             $config,
-            0
+            0,
         );
 
         $this->assertStringContainsString('Checking user termination', $process->getOutput());
@@ -315,7 +452,7 @@ class DatadirTest extends AbstractDatadirTestCase
             $config,
             1,
             null,
-            "Tables \"invalid_testmetadata\" specified in output were not created by the transformation.\n"
+            "Tables \"invalid_testmetadata\" specified in output were not created by the transformation.\n",
         );
     }
 
@@ -341,7 +478,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $process = $this->runAppWithConfig(
             $config,
-            2
+            2,
         );
         $this->assertStringContainsString('Missing authorization for workspace', $process->getErrorOutput());
     }
@@ -380,7 +517,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $connection = new Connection($configArray['authorization']['workspace']);
 
         $insertedData = $connection->fetchAll(
-            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('query_tag'))
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('query_tag')),
         );
 
         $this->assertNotEmpty($insertedData);
@@ -413,7 +550,7 @@ class DatadirTest extends AbstractDatadirTestCase
             $config,
             1,
             null,
-            "Transformation aborted with message \"Abort Me Please\"\n"
+            "Transformation aborted with message \"Abort Me Please\"\n",
         );
     }
 
@@ -560,14 +697,14 @@ class DatadirTest extends AbstractDatadirTestCase
         array $config,
         int $expectedReturnCode = 0,
         ?string $expectedStdout = null,
-        ?string $expectedStderr = null
+        ?string $expectedStderr = null,
     ): Process {
         $specification = new DatadirTestSpecification(
             null,
             $expectedReturnCode,
             $expectedStdout,
             $expectedStderr,
-            null
+            null,
         );
 
         $tempDatadir = $this->getTempDatadir($specification);
@@ -603,16 +740,20 @@ class DatadirTest extends AbstractDatadirTestCase
         return [
             'ID' => [
                 [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'NUMBER',
-                ],
-                [
                     'key' => 'KBC.datatype.nullable',
-                    'value' => true,
+                    'value' => false,
                 ],
                 [
                     'key' => 'KBC.datatype.basetype',
                     'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.default',
+                    'value' => 'IDENTITY START 1 INCREMENT 1 NOORDER',
+                ],
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
                 ],
                 [
                     'key' => 'KBC.datatype.length',
@@ -620,10 +761,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 ],
             ],
             'NAME' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'VARCHAR',
-                ],
                 [
                     'key' => 'KBC.datatype.nullable',
                     'value' => true,
@@ -633,15 +770,15 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'STRING',
                 ],
                 [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'VARCHAR',
+                ],
+                [
                     'key' => 'KBC.datatype.length',
                     'value' => '200',
                 ],
             ],
             'NOTNULL' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'VARCHAR',
-                ],
                 [
                     'key' => 'KBC.datatype.nullable',
                     'value' => false,
@@ -651,15 +788,15 @@ class DatadirTest extends AbstractDatadirTestCase
                     'value' => 'STRING',
                 ],
                 [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'VARCHAR',
+                ],
+                [
                     'key' => 'KBC.datatype.length',
                     'value' => '200',
                 ],
             ],
             'DECIMAL' => [
-                [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'NUMBER',
-                ],
                 [
                     'key' => 'KBC.datatype.nullable',
                     'value' => true,
@@ -667,6 +804,10 @@ class DatadirTest extends AbstractDatadirTestCase
                 [
                     'key' => 'KBC.datatype.basetype',
                     'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
                 ],
                 [
                     'key' => 'KBC.datatype.length',
@@ -675,16 +816,16 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
             'NUMERIC' => [
                 [
-                    'key' => 'KBC.datatype.type',
-                    'value' => 'NUMBER',
-                ],
-                [
                     'key' => 'KBC.datatype.nullable',
                     'value' => true,
                 ],
                 [
                     'key' => 'KBC.datatype.basetype',
                     'value' => 'NUMERIC',
+                ],
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'NUMBER',
                 ],
                 [
                     'key' => 'KBC.datatype.length',
@@ -763,7 +904,7 @@ class DatadirTest extends AbstractDatadirTestCase
             $config,
             1,
             null,
-            "Transformation aborted with message \"Abort Me Please\"\n"
+            "Transformation aborted with message \"Abort Me Please\"\n",
         );
 
         $this->assertStringContainsString('Checking user termination', $process->getOutput());
@@ -805,7 +946,7 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->runAppWithConfig($configArray);
         $connection = new Connection($configArray['authorization']['workspace']);
         $insertedData = $connection->fetchAll(
-            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('envvars'))
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('envvars')),
         );
         $this->assertEquals($insertedData, [
             [

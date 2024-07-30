@@ -1,4 +1,3 @@
-version: '2'
 services:
   app: &base
     build:
@@ -14,6 +13,7 @@ services:
       - SNOWFLAKE_PASSWORD
       - STORAGE_API_TOKEN
       - KBC_RUNID
+      - KBC_DATA_TYPE_SUPPORT=none
     volumes:
       - ./data:/data
 

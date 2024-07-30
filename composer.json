@@ -16,8 +16,8 @@
         "jdorn/sql-formatter": "dev-master",
         "keboola/common-exceptions": "^1.0",
         "keboola/db-adapter-snowflake": "^1.3",
-        "keboola/php-component": "^9.3",
-        "keboola/php-datatypes": "^6.3",
+        "keboola/php-component": "^10.0",
+        "keboola/php-datatypes": "^7.0",
         "keboola/table-backend-utils": "^2.0",
         "symfony/config": "^5.0"
     },
