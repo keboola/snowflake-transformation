@@ -39,7 +39,7 @@ jobs:
       is_semantic_tag: ${{ steps.tag.outputs.is_semantic_tag }}
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Print Docker version
         run: docker -v
       - name: Docker login
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Pull image from ECR
         uses: keboola/action-pull-from-ecr@master
         with:
