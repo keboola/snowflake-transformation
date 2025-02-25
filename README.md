@@ -1,20 +1,20 @@
-# Snowflake transformation
+# Snowflake Transformation
 
 [![Build Status](https://travis-ci.com/keboola/snowflake-transformation.svg?branch=master)](https://travis-ci.com/keboola/snowflake-transformation)
 
-Application which runs KBC transformations
+This application runs with Keboola transformations.
 
 ## Options
 
-- `authorization` object (required): [workspace credentials](https://developers.keboola.com/extend/common-interface/folders/#exchanging-data-via-workspace)
+- `authorization` object (required): [Workspace credentials](https://developers.keboola.com/extend/common-interface/folders/#exchanging-data-via-workspace)
 - `parameters`
-    - `blocks` array (required): list of blocks
-        - `name` string (required): name of the block
-        - `codes` array (required): list of codes
-            - `name` string (required): name of the code
-            - `script` array (required): list of sql queries
+    - `blocks` array (required): List of blocks
+        - `name` string (required): Name of the block
+        - `codes` array (required): List of codes
+            - `name` string (required): Name of the code
+            - `script` array (required): List of sql queries
 
-## Example configuration
+## Example Configuration
 
 ```json
 {
@@ -50,7 +50,7 @@ Application which runs KBC transformations
 
 ## Development
  
-Clone this repository and init the workspace with following command:
+Clone this repository and initialize the workspace with the following commands:
 
 ```
 git clone https://github.com/keboola/snowflake-transformation
@@ -59,7 +59,7 @@ docker-compose build
 docker-compose run --rm dev composer install --no-scripts
 ```
 
-Create `.env` file with following contents
+Create a `.env` file with the following contents:
 ```
 SNOWFLAKE_HOST=
 SNOWFLAKE_WAREHOUSE=
