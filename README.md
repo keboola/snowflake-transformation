@@ -78,4 +78,4 @@ docker-compose run --rm dev composer tests
 
 ## License
 
-MIT licensed, see [LICENSE](./LICENSE) file.
+MIT licensed, see the [LICENSE](./LICENSE) file.
