@@ -22,7 +22,7 @@ class SnowflakeTransformationComponent extends BaseComponent
     {
         /** @var Config $config */
         $config = $this->getConfig();
-
+        $this->getLogger()->info('data type support - ' . getenv('KBC_DATA_TYPE_SUPPORT'));
         $snowflakeTransformation = new SnowflakeTransformation($config, $this->getLogger());
 
         $snowflakeTransformation->setSession($config);
