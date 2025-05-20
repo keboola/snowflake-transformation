@@ -59,6 +59,56 @@ class DatadirTest extends AbstractDatadirTestCase
         ]);
     }
 
+    public function testTransformDataWithKeyPair(): void
+    {
+        $config = $this->getDatabaseConfig();
+        $config['workspace']['password'] = '';
+        $config['workspace']['privateKey'] = getenv('SNOWFLAKE_PRIVATEKEY');
+
+        // phpcs:disable Generic.Files.LineLength
+        $configArray = [
+            'authorization' => $config,
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "output"',
+                                    'CREATE TABLE IF NOT EXISTS "output" ("name" VARCHAR(200),"usercity" VARCHAR(200));',
+                                    "INSERT INTO \"output\" VALUES ('ondra', 'liberec'), ('odin', 'brno'), ('najlos', 'liberec')",
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($configArray);
+        $connection = new Connection($configArray['authorization']['workspace']);
+        $insertedData = $connection->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('output')),
+        );
+        $this->assertEquals($insertedData, [
+            [
+                'name' => 'ondra',
+                'usercity' => 'liberec',
+            ],
+            [
+                'name' => 'odin',
+                'usercity' => 'brno',
+            ],
+            [
+                'name' => 'najlos',
+                'usercity' => 'liberec',
+            ],
+        ]);
+    }
+
     public function testQueryFailed(): void
     {
         $config = [

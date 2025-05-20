@@ -13,6 +13,7 @@ $environments = [
     'SNOWFLAKE_SCHEMA',
     'SNOWFLAKE_USER',
     'SNOWFLAKE_PASSWORD',
+    'SNOWFLAKE_PRIVATEKEY',
     'KBC_RUNID',
 ];
 

@@ -1364,20 +1364,21 @@
         },
         {
             "name": "keboola/db-adapter-snowflake",
-            "version": "1.4.0",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-adapter-snowflake.git",
-                "reference": "8d1548cc3724dc588b3fd38bb970072da6041158"
+                "reference": "f6a006bf507ed0493615530d4cf4f9bfb4b80e40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-adapter-snowflake/zipball/8d1548cc3724dc588b3fd38bb970072da6041158",
-                "reference": "8d1548cc3724dc588b3fd38bb970072da6041158",
+                "url": "https://api.github.com/repos/keboola/db-adapter-snowflake/zipball/f6a006bf507ed0493615530d4cf4f9bfb4b80e40",
+                "reference": "f6a006bf507ed0493615530d4cf4f9bfb4b80e40",
                 "shasum": ""
             },
             "require": {
                 "ext-odbc": "*",
+                "ext-openssl": "*",
                 "php": "^8.0"
             },
             "require-dev": {
@@ -1400,9 +1401,9 @@
                 "MIT"
             ],
             "support": {
-                "source": "https://github.com/keboola/db-adapter-snowflake/tree/1.4.0"
+                "source": "https://github.com/keboola/db-adapter-snowflake/tree/1.5.1"
             },
-            "time": "2023-06-02T07:06:55+00:00"
+            "time": "2025-04-28T10:43:58+00:00"
         },
         {
             "name": "keboola/php-component",
@@ -5756,16 +5757,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v5.4.40",
+            "version": "v5.4.47",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "deedcb3bb4669cae2148bc920eafd2b16dc7c046"
+                "reference": "5d1662fb32ebc94f17ddb8d635454a776066733d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/deedcb3bb4669cae2148bc920eafd2b16dc7c046",
-                "reference": "deedcb3bb4669cae2148bc920eafd2b16dc7c046",
+                "url": "https://api.github.com/repos/symfony/process/zipball/5d1662fb32ebc94f17ddb8d635454a776066733d",
+                "reference": "5d1662fb32ebc94f17ddb8d635454a776066733d",
                 "shasum": ""
             },
             "require": {
@@ -5798,7 +5799,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v5.4.40"
+                "source": "https://github.com/symfony/process/tree/v5.4.47"
             },
             "funding": [
                 {
@@ -5814,7 +5815,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T14:33:22+00:00"
+            "time": "2024-11-06T11:36:42+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -5879,6 +5880,6 @@
         "ext-json": "*",
         "ext-mbstring": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

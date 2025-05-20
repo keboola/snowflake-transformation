@@ -20,6 +20,7 @@ env:
   SNOWFLAKE_SCHEMA: "snowflake_transformation"
   SNOWFLAKE_USER: "snowflake_transformation"
   SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+  SNOWFLAKE_PRIVATEKEY: ${{ secrets.SNOWFLAKE_PRIVATEKEY }}
   KBC_RUNID: 123456
 
   # DockerHub login
@@ -92,6 +93,7 @@ jobs:
             -e SNOWFLAKE_SCHEMA \
             -e SNOWFLAKE_USER \
             -e SNOWFLAKE_PASSWORD \
+            -e SNOWFLAKE_PRIVATEKEY \
             -e KBC_RUNID \
             -e KBC_DATA_TYPE_SUPPORT \
             ${{ env.APP_IMAGE }} \
