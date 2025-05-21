@@ -26,15 +26,24 @@ class Config extends BaseConfig
     {
         try {
             $databaseConfig = $this->getArrayValue(['authorization', 'workspace']);
-            $databaseConfig = array_intersect_key($databaseConfig, array_fill_keys([
+            $databaseConfig['password'] ??= '';
+
+            $keysToFill = [
                 'host',
                 'port',
                 'user',
                 'password',
+                'privateKey',
                 'warehouse',
                 'database',
                 'schema',
-            ], true));
+            ];
+
+            if (isset($databaseConfig['privateKey'])) {
+                $keysToFill[] = 'privateKey';
+            }
+
+            $databaseConfig = array_intersect_key($databaseConfig, array_fill_keys($keysToFill, true));
             $databaseConfig['clientSessionKeepAlive'] = true;
             $databaseConfig['application'] = self::SNOWFLAKE_APPLICATION;
 
