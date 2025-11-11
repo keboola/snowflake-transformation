@@ -52,4 +52,18 @@ class Config extends BaseConfig
             throw new ApplicationException('Missing authorization for workspace');
         }
     }
+
+    /**
+     * @return array<array{source: string, write_always?: bool}>
+     */
+    public function getExpectedOutputTables(): array
+    {
+        /** @var array<array{source: string, write_always?: bool, unload_strategy?: string}> $tables */
+        $tables = parent::getExpectedOutputTables();
+        /** @var array<array{source: string, write_always?: bool}> $filtered */
+        $filtered = array_filter($tables, function ($table) {
+            return !isset($table['unload_strategy']) || $table['unload_strategy'] !== 'direct-grant';
+        });
+        return $filtered;
+    }
 }

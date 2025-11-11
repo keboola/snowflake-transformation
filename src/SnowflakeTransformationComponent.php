@@ -32,9 +32,7 @@ class SnowflakeTransformationComponent extends BaseComponent
             $snowflakeTransformation->processBlocks($config->getBlocks());
         } catch (UserException $e) {
             $snowflakeTransformation->createManifestMetadata(
-                array_filter($config->getExpectedOutputTables(), function ($table) {
-                    return !isset($table['unload_strategy']) || $table['unload_strategy'] !== 'direct-grant';
-                }),
+                $config->getExpectedOutputTables(),
                 new ManifestManager($this->getDataDir()),
                 $this->config->getDataTypeSupport()->usingLegacyManifest(),
                 true,
@@ -44,11 +42,8 @@ class SnowflakeTransformationComponent extends BaseComponent
 
         /** @var array<array{source: string}> $tables */
         $tables = $config->getExpectedOutputTables();
-        $tablesForManifest = array_filter($tables, function ($table) {
-            return !isset($table['unload_strategy']) || $table['unload_strategy'] !== 'direct-grant';
-        });
         $snowflakeTransformation->createManifestMetadata(
-            $tablesForManifest,
+            $tables,
             new ManifestManager($this->getDataDir()),
             $this->config->getDataTypeSupport()->usingLegacyManifest(),
         );
