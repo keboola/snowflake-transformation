@@ -1015,7 +1015,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'output' => [
                     'tables' => [
                         [
-                            'source' => 'direct_grant_table',
                             'destination' => 'out.c-my.direct_grant_table',
                             'unload_strategy' => 'direct-grant',
                         ],
@@ -1063,7 +1062,6 @@ class DatadirTest extends AbstractDatadirTestCase
                 'output' => [
                     'tables' => [
                         [
-                            'source' => 'missing_direct_grant_table',
                             'destination' => 'out.c-my.missing_direct_grant_table',
                             'unload_strategy' => 'direct-grant',
                         ],
@@ -1107,7 +1105,6 @@ class DatadirTest extends AbstractDatadirTestCase
                             'destination' => 'out.c-my.regular_table',
                         ],
                         [
-                            'source' => 'direct_grant_table',
                             'destination' => 'out.c-my.direct_grant_table',
                             'unload_strategy' => 'direct-grant',
                         ],
