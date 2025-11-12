@@ -138,6 +138,156 @@ class ConfigTest extends TestCase
         self::assertArrayNotHasKey('unknownKey', $config->getDatabaseConfig());
     }
 
+    public function testGetExpectedOutputTablesFiltersDirectGrant(): void
+    {
+        $configArray = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'SELECT 1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'regular_table',
+                            'destination' => 'out.c-my.regular_table',
+                        ],
+                        [
+                            'destination' => 'out.c-my.direct_grant_table',
+                            'unload_strategy' => 'direct-grant',
+                        ],
+                        [
+                            'source' => 'table_without_strategy',
+                            'destination' => 'out.c-my.table_without_strategy',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $configDefinition = new ConfigDefinition();
+        $config = new Config($configArray, $configDefinition);
+
+        $expectedTables = $config->getExpectedOutputTables();
+
+        $this->assertCount(2, $expectedTables);
+
+        $sources = array_column($expectedTables, 'source');
+        $this->assertContains('regular_table', $sources);
+        $this->assertContains('table_without_strategy', $sources);
+    }
+
+    public function testGetExpectedOutputTablesWithNoDirectGrant(): void
+    {
+        $configArray = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'SELECT 1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'regular_table',
+                            'destination' => 'out.c-my.regular_table',
+                        ],
+                        [
+                            'source' => 'another_table',
+                            'destination' => 'out.c-my.another_table',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $configDefinition = new ConfigDefinition();
+        $config = new Config($configArray, $configDefinition);
+
+        $expectedTables = $config->getExpectedOutputTables();
+
+        $this->assertCount(2, $expectedTables);
+    }
+
+    public function testGetExpectedOutputTablesWithOnlyDirectGrant(): void
+    {
+        $configArray = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'SELECT 1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'destination' => 'out.c-my.direct_grant_table',
+                            'unload_strategy' => 'direct-grant',
+                        ],
+                        [
+                            'destination' => 'out.c-my.another_direct_grant_table',
+                            'unload_strategy' => 'direct-grant',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $configDefinition = new ConfigDefinition();
+        $config = new Config($configArray, $configDefinition);
+
+        $expectedTables = $config->getExpectedOutputTables();
+
+        $this->assertCount(0, $expectedTables);
+    }
+
+    /**
+     * @return array{
+     *     workspace: array{
+     *        host: string,
+     *        warehouse: string,
+     *        database: string,
+     *        schema: string,
+     *        user: string,
+     *        password: string,
+     *        unknownKey: string
+     *    }
+     * }
+     */
     private function getDatabaseConfig(): array
     {
         return [

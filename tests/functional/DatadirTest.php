@@ -1005,4 +1005,169 @@ class DatadirTest extends AbstractDatadirTestCase
             ],
         ]);
     }
+
+    public function testDirectGrantTableSkipsManifest(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'destination' => 'out.c-my.direct_grant_table',
+                            'unload_strategy' => 'direct-grant',
+                        ],
+                    ],
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "direct_grant_table";',
+                                    'CREATE TABLE "direct_grant_table" (id int, name varchar(200));',
+                                    'INSERT INTO "direct_grant_table" VALUES (1, \'test\');',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $connection = new Connection($config['authorization']['workspace']);
+        $insertedData = $connection->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('direct_grant_table')),
+        );
+        $this->assertCount(1, $insertedData);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/direct_grant_table.manifest';
+        $this->assertFileDoesNotExist($manifestFilePath);
+    }
+
+    public function testMissingDirectGrantTableDoesNotFail(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'destination' => 'out.c-my.missing_direct_grant_table',
+                            'unload_strategy' => 'direct-grant',
+                        ],
+                    ],
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'SELECT 1',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config, 0);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/missing_direct_grant_table.manifest';
+        $this->assertFileDoesNotExist($manifestFilePath);
+    }
+
+    public function testMixedDirectGrantAndRegularTables(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'regular_table',
+                            'destination' => 'out.c-my.regular_table',
+                        ],
+                        [
+                            'destination' => 'out.c-my.direct_grant_table',
+                            'unload_strategy' => 'direct-grant',
+                        ],
+                        [
+                            'source' => 'another_regular_table',
+                            'destination' => 'out.c-my.another_regular_table',
+                            'unload_strategy' => 'copy',
+                        ],
+                    ],
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'DROP TABLE IF EXISTS "regular_table";',
+                                    'CREATE TABLE "regular_table" (id int, name varchar(200));',
+                                    'INSERT INTO "regular_table" VALUES (1, \'regular\');',
+                                    'DROP TABLE IF EXISTS "direct_grant_table";',
+                                    'CREATE TABLE "direct_grant_table" (id int, name varchar(200));',
+                                    'INSERT INTO "direct_grant_table" VALUES (2, \'direct_grant\');',
+                                    'DROP TABLE IF EXISTS "another_regular_table";',
+                                    'CREATE TABLE "another_regular_table" (id int, name varchar(200));',
+                                    'INSERT INTO "another_regular_table" VALUES (3, \'another_regular\');',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $connection = new Connection($config['authorization']['workspace']);
+
+        $regularData = $connection->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('regular_table')),
+        );
+        $this->assertCount(1, $regularData);
+
+        $directGrantData = $connection->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('direct_grant_table')),
+        );
+        $this->assertCount(1, $directGrantData);
+
+        $anotherRegularData = $connection->fetchAll(
+            sprintf('SELECT * FROM %s', QueryBuilder::quoteIdentifier('another_regular_table')),
+        );
+        $this->assertCount(1, $anotherRegularData);
+
+        $regularManifestPath = $this->temp->getTmpFolder() . '/out/tables/regular_table.manifest';
+        $this->assertFileExists($regularManifestPath);
+
+        $directGrantManifestPath = $this->temp->getTmpFolder() . '/out/tables/direct_grant_table.manifest';
+        $this->assertFileDoesNotExist($directGrantManifestPath);
+
+        $anotherRegularManifestPath = $this->temp->getTmpFolder() . '/out/tables/another_regular_table.manifest';
+        $this->assertFileExists($anotherRegularManifestPath);
+    }
 }
