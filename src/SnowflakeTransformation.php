@@ -184,8 +184,6 @@ class SnowflakeTransformation
                 throw new UserException($message, 0, $exception);
             }
 
-            $this->verifyLastQuerySucceeded($query, $blockName);
-
             $pattern = sprintf('/%s/i', preg_quote(self::ABORT_TRANSFORMATION, '/'));
             if (preg_match($pattern, $uncommentedQuery)) {
                 $this->checkUserTermination();
@@ -286,33 +284,6 @@ class SnowflakeTransformation
             );
         }
         return $defs;
-    }
-
-    private function verifyLastQuerySucceeded(string $query, string $blockName): void
-    {
-        try {
-            $result = $this->connection->fetchAll(
-                'SELECT EXECUTION_STATUS AS "status", ERROR_MESSAGE AS "errorMessage" ' .
-                'FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION(RESULT_LIMIT => 10)) ' .
-                'WHERE QUERY_ID = LAST_QUERY_ID()',
-            );
-        } catch (Throwable $e) {
-            $this->logger->warning(
-                sprintf('Failed to verify query execution status: %s', $e->getMessage()),
-            );
-            return;
-        }
-
-        if (!empty($result) && $result[0]['status'] === 'FAIL') {
-            throw new UserException(
-                sprintf(
-                    'Query "%s" in "%s" failed with error: "%s"',
-                    $this->queryExcerpt($query),
-                    $blockName,
-                    $result[0]['errorMessage'],
-                ),
-            );
-        }
     }
 
     private function queryExcerpt(string $query): string
