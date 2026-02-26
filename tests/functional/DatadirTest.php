@@ -1170,4 +1170,36 @@ class DatadirTest extends AbstractDatadirTestCase
         $anotherRegularManifestPath = $this->temp->getTmpFolder() . '/out/tables/another_regular_table.manifest';
         $this->assertFileExists($anotherRegularManifestPath);
     }
+
+    public function testExportSessionVariables(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [[
+                    'name' => 'first block',
+                    'codes' => [[
+                        'name' => 'first code',
+                        'script' => [
+                            'DROP TABLE IF EXISTS "orders";',
+                            'CREATE TABLE "orders" ("id" INT);',
+                            'INSERT INTO "orders" VALUES (1), (2), (3);',
+                            'SET max_order_id = (SELECT MAX(id) FROM "orders");',
+                        ],
+                    ]],
+                ]],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $variablesFilePath = $this->temp->getTmpFolder() . '/out/variables.json';
+        $this->assertFileExists($variablesFilePath);
+
+        $variables = json_decode((string) file_get_contents($variablesFilePath), true);
+        $this->assertArrayHasKey('MAX_ORDER_ID', $variables);
+        $this->assertSame('3', $variables['MAX_ORDER_ID']);
+    }
 }

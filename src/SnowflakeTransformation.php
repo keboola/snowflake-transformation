@@ -294,6 +294,24 @@ class SnowflakeTransformation
         return $query;
     }
 
+    public function exportSessionVariables(string $dataDir): void
+    {
+        $result = $this->connection->fetchAll('SHOW VARIABLES');
+
+        $variables = [];
+        foreach ($result as $row) {
+            if (str_starts_with($row['name'], 'KBC_')) {
+                continue;
+            }
+            $variables[$row['name']] = $row['value'];
+        }
+
+        file_put_contents(
+            $dataDir . '/out/variables.json',
+            (string) json_encode($variables),
+        );
+    }
+
     /**
      * @throws \Keboola\Component\UserException
      */
