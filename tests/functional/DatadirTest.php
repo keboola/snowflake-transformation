@@ -1183,7 +1183,7 @@ class DatadirTest extends AbstractDatadirTestCase
                         'name' => 'first code',
                         'script' => [
                             'DROP TABLE IF EXISTS "orders";',
-                            'CREATE TABLE "orders" ("id" INT);',
+                            'CREATE TABLE "orders" (id INT);',
                             'INSERT INTO "orders" VALUES (1), (2), (3);',
                             'SET max_order_id = (SELECT MAX(id) FROM "orders");',
                         ],
