@@ -1201,5 +1201,32 @@ class DatadirTest extends AbstractDatadirTestCase
         $variables = json_decode((string) file_get_contents($variablesFilePath), true);
         $this->assertArrayHasKey('MAX_ORDER_ID', $variables);
         $this->assertSame('3', $variables['MAX_ORDER_ID']);
+        $this->assertArrayNotHasKey('KBC_RUNID', $variables);
+        $this->assertArrayNotHasKey('KBC_PROJECTID', $variables);
+    }
+
+    public function testExportSessionVariablesEmptyWhenNoUserVariables(): void
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [[
+                    'name' => 'first block',
+                    'codes' => [[
+                        'name' => 'first code',
+                        'script' => [
+                            'SELECT 1;',
+                        ],
+                    ]],
+                ]],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $variablesFilePath = $this->temp->getTmpFolder() . '/out/variables.json';
+        $this->assertFileDoesNotExist($variablesFilePath);
     }
 }

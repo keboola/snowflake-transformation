@@ -306,6 +306,10 @@ class SnowflakeTransformation
             $variables[$row['name']] = $row['value'];
         }
 
+        if ($variables === []) {
+            return;
+        }
+
         file_put_contents(
             $dataDir . '/out/variables.json',
             (string) json_encode($variables),
