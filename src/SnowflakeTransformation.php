@@ -311,8 +311,8 @@ class SnowflakeTransformation
         }
 
         file_put_contents(
-            $dataDir . '/out/variables.json',
-            (string) json_encode($variables),
+            $dataDir . '/out/result.json',
+            (string) json_encode(['variables' => $variables]),
         );
     }
 

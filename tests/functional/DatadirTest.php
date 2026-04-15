@@ -1195,10 +1195,12 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $this->runAppWithConfig($config);
 
-        $variablesFilePath = $this->temp->getTmpFolder() . '/out/variables.json';
-        $this->assertFileExists($variablesFilePath);
+        $resultFilePath = $this->temp->getTmpFolder() . '/out/result.json';
+        $this->assertFileExists($resultFilePath);
 
-        $variables = json_decode((string) file_get_contents($variablesFilePath), true);
+        $result = json_decode((string) file_get_contents($resultFilePath), true);
+        $this->assertArrayHasKey('variables', $result);
+        $variables = $result['variables'];
         $this->assertArrayHasKey('MAX_ORDER_ID', $variables);
         $this->assertSame('3', $variables['MAX_ORDER_ID']);
         $this->assertArrayNotHasKey('KBC_RUNID', $variables);
@@ -1226,7 +1228,7 @@ class DatadirTest extends AbstractDatadirTestCase
 
         $this->runAppWithConfig($config);
 
-        $variablesFilePath = $this->temp->getTmpFolder() . '/out/variables.json';
-        $this->assertFileDoesNotExist($variablesFilePath);
+        $resultFilePath = $this->temp->getTmpFolder() . '/out/result.json';
+        $this->assertFileDoesNotExist($resultFilePath);
     }
 }
