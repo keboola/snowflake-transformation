@@ -47,6 +47,7 @@ class SnowflakeTransformationComponent extends BaseComponent
             new ManifestManager($this->getDataDir()),
             $this->config->getDataTypeSupport()->usingLegacyManifest(),
         );
+        $snowflakeTransformation->exportSessionVariables($this->getDataDir());
     }
 
     protected function getConfigClass(): string
