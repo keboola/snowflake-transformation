@@ -727,6 +727,9 @@ class DatadirTest extends AbstractDatadirTestCase
                 'database' => getenv('SNOWFLAKE_DATABASE'),
                 'schema' => getenv('SNOWFLAKE_SCHEMA'),
                 'user' => getenv('SNOWFLAKE_USER'),
+                // Password is required by the Snowflake adapter signature
+                // but left empty so authentication uses the private key below.
+                'password' => '',
                 'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             ],
         ];
