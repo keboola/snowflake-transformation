@@ -25,7 +25,7 @@ This application runs with Keboola transformations.
       "database": "snowflake_database",
       "schema": "snowflake_schema",
       "user": "snowflake_user",
-      "password": "snowflake_password"
+      "privateKey": "snowflake_private_key"
     }
   },
   "parameters": {
@@ -66,7 +66,7 @@ SNOWFLAKE_WAREHOUSE=
 SNOWFLAKE_DATABASE=
 SNOWFLAKE_SCHEMA=
 SNOWFLAKE_USER=
-SNOWFLAKE_PASSWORD=
+SNOWFLAKE_PRIVATEKEY=
 KBC_RUNID=
 ```
 
