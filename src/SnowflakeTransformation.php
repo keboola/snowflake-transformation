@@ -26,6 +26,13 @@ class SnowflakeTransformation
 {
     private const ABORT_TRANSFORMATION = 'ABORT_TRANSFORMATION';
 
+    /**
+     * Service name written into the Snowflake QUERY_TAG (`service` / `keboola_service` keys)
+     * so queries run by this component are identifiable in Snowflake query history
+     * alongside other Keboola services (Query Service uses "query-service", Storage API "sapi").
+     */
+    private const QUERY_TAG_SERVICE = 'tapi';
+
     private Connection $connection;
 
     private LoggerInterface $logger;
@@ -115,7 +122,7 @@ class SnowflakeTransformation
     public function setSession(Config $config): void
     {
         $sessionVariables = [];
-        $sessionVariables['QUERY_TAG'] = sprintf("'%s'", json_encode(['runId' => getenv('KBC_RUNID')]));
+        $sessionVariables['QUERY_TAG'] = sprintf("'%s'", json_encode($this->buildQueryTag()));
         $sessionVariables['STATEMENT_TIMEOUT_IN_SECONDS'] = $config->getQueryTimeout();
 
         array_walk($sessionVariables, function (&$item, $key): void {
@@ -130,6 +137,18 @@ class SnowflakeTransformation
 
         $query = sprintf('ALTER SESSION SET %s;', implode(',', $sessionVariables));
         $this->executeQueries('alter session', [$query]);
+    }
+
+    /**
+     * @return array{runId: string|false, service: string, keboola_service: string}
+     */
+    private function buildQueryTag(): array
+    {
+        return [
+            'runId' => getenv('KBC_RUNID'),
+            'service' => self::QUERY_TAG_SERVICE,
+            'keboola_service' => self::QUERY_TAG_SERVICE,
+        ];
     }
 
     /**
