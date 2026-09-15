@@ -19,11 +19,11 @@ This application runs with Keboola transformations.
 Every query executed by this component runs in a session with `QUERY_TAG` set to a JSON object:
 
 ```json
-{"runId": "<KBC_RUNID>", "service": "tapi", "keboola_service": "tapi"}
+{"runId": "<KBC_RUNID>", "service": "sql-transformation", "keboola_service": "sql-transformation"}
 ```
 
 - `runId` is taken from the `KBC_RUNID` environment variable.
-- `service` / `keboola_service` identify the originating Keboola service (`tapi` for transformations) and follow the platform-wide `QUERY_TAG` convention used by Storage API (`sapi`) and Query Service (`query-service`), so queries can be grouped in Snowflake query history.
+- `service` / `keboola_service` identify the originating Keboola service (`sql-transformation` for this component) and follow the platform-wide `QUERY_TAG` convention used by Storage API (`sapi`) and Query Service (`query-service`), so queries can be grouped in Snowflake query history.
 
 ## Example Configuration
 

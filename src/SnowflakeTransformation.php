@@ -31,7 +31,7 @@ class SnowflakeTransformation
      * so queries run by this component are identifiable in Snowflake query history
      * alongside other Keboola services (Query Service uses "query-service", Storage API "sapi").
      */
-    private const QUERY_TAG_SERVICE = 'tapi';
+    private const QUERY_TAG_SERVICE = 'sql-transformation';
 
     private Connection $connection;
 
