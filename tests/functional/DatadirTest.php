@@ -571,7 +571,10 @@ class DatadirTest extends AbstractDatadirTestCase
         );
 
         $this->assertNotEmpty($insertedData);
-        $expectedData = sprintf('{"runId":"%s"}', getenv('KBC_RUNID'));
+        $expectedData = sprintf(
+            '{"runId":"%s","service":"sql-transformation","keboola_service":"sql-transformation"}',
+            getenv('KBC_RUNID'),
+        );
         $this->assertEquals($expectedData, $insertedData[0]['QUERY_TAG']);
     }
 
