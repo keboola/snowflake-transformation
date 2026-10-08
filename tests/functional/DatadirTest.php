@@ -780,7 +780,8 @@ class DatadirTest extends AbstractDatadirTestCase
                 'database' => getenv('SNOWFLAKE_DATABASE'),
                 'schema' => getenv('SNOWFLAKE_SCHEMA'),
                 'user' => getenv('SNOWFLAKE_USER'),
-                'password' => getenv('SNOWFLAKE_PASSWORD'),
+                'password' => '',
+                'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             ],
         ];
     }
