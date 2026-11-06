@@ -372,6 +372,108 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertSame($expectedSchema, $manifestData['schema']);
     }
 
+    public function testManifestDescriptionsLegacyManifest(): void
+    {
+        $manifestData = $this->runAppWithCommentedTable('none');
+
+        $this->assertArrayNotHasKey('description', $manifestData);
+        $this->assertEquals(
+            [
+                ['key' => 'KBC.name', 'value' => 'commented'],
+                ['key' => 'KBC.datatype.backend', 'value' => 'snowflake'],
+                ['key' => 'KBC.description', 'value' => 'Customer table'],
+            ],
+            $manifestData['metadata'],
+        );
+        $this->assertContains(
+            ['key' => 'KBC.description', 'value' => 'Customer identifier'],
+            $manifestData['column_metadata']['ID'],
+        );
+        foreach (['EMPTY_COMMENT', 'NO_COMMENT'] as $column) {
+            $this->assertNotContains('KBC.description', array_column($manifestData['column_metadata'][$column], 'key'));
+        }
+    }
+
+    public function testManifestDescriptionsNewManifest(): void
+    {
+        $manifestData = $this->runAppWithCommentedTable('authoritative');
+
+        $this->assertSame('Customer table', $manifestData['description']);
+        $this->assertSame(
+            ['KBC.name' => 'commented', 'KBC.datatype.backend' => 'snowflake'],
+            $manifestData['table_metadata'],
+        );
+        $descriptions = array_combine(
+            array_column($manifestData['schema'], 'name'),
+            array_map(fn(array $column) => $column['description'] ?? null, $manifestData['schema']),
+        );
+        $this->assertSame(
+            ['ID' => 'Customer identifier', 'EMPTY_COMMENT' => null, 'NO_COMMENT' => null],
+            $descriptions,
+        );
+    }
+
+    /**
+     * @dataProvider manifestFormatProvider
+     */
+    public function testManifestWithoutTableComment(string $dataTypeSupport, string $metadataKey): void
+    {
+        $manifestData = $this->runAppWithCommentedTable($dataTypeSupport, false);
+
+        $this->assertArrayNotHasKey('description', $manifestData);
+        $this->assertStringNotContainsString('KBC.description', (string) json_encode($manifestData[$metadataKey]));
+    }
+
+    public function manifestFormatProvider(): iterable
+    {
+        yield 'legacy manifest' => ['none', 'metadata'];
+        yield 'new manifest' => ['authoritative', 'table_metadata'];
+    }
+
+    private function runAppWithCommentedTable(string $dataTypeSupport, bool $withTableComment = true): array
+    {
+        // phpcs:disable Generic.Files.LineLength
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'storage' => [
+                'output' => [
+                    'tables' => [
+                        [
+                            'source' => 'commented',
+                            'destination' => 'out.c-my.commented',
+                        ],
+                    ],
+                    'data_type_support' => $dataTypeSupport,
+                ],
+            ],
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    'drop table if exists "commented";',
+                                    sprintf(
+                                        'create table "commented" (id int COMMENT \'Customer identifier\', empty_comment varchar(200) COMMENT \'\', no_comment varchar(200))%s;',
+                                        $withTableComment ? ' COMMENT = \'Customer table\'' : '',
+                                    ),
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        // phpcs:enable
+
+        $this->runAppWithConfig($config);
+
+        $manifestFilePath = $this->temp->getTmpFolder() . '/out/tables/commented.manifest';
+        return (array) json_decode((string) file_get_contents($manifestFilePath), true);
+    }
+
     public function testManifestMetadataWithTableNameExistingInAnotherSchema(): void
     {
         // phpcs:disable Generic.Files.LineLength
