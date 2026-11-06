@@ -33,6 +33,8 @@ class SnowflakeTransformation
      */
     private const QUERY_TAG_SERVICE = 'sql-transformation';
 
+    private const KBC_DESCRIPTION = 'KBC.description';
+
     private Connection $connection;
 
     private LoggerInterface $logger;
@@ -63,57 +65,123 @@ class SnowflakeTransformation
         bool $transformationFailed = false,
     ): void {
         $tableStructures = $this->getTables($tableNames, $transformationFailed);
-        foreach ($tableStructures as $tableDef) {
-            $schema = [];
-
-            /** @var SnowflakeColumn $column */
-            foreach ($tableDef->getColumnsDefinitions() as $column) {
-                $dataTypes = [
-                    'base' => [
-                        'type' => $column->getColumnDefinition()->getBasetype(),
-                    ],
-                    Snowflake::METADATA_BACKEND => [
-                        'type' => $column->getColumnDefinition()->getType(),
-                    ],
-                ];
-
-                if ($column->getColumnDefinition()->getLength() !== null) {
-                    $dataTypes['snowflake']['length'] = $column->getColumnDefinition()->getLength();
-                }
-
-                if ($column->getColumnDefinition()->getDefault() !== null) {
-                    $dataTypes['base']['default'] = $column->getColumnDefinition()->getDefault();
-                    $dataTypes['snowflake']['default'] = $column->getColumnDefinition()->getDefault();
-                }
-
-                $schema[] = new ManifestOptionsSchema(
-                    $column->getColumnName(),
-                    $dataTypes,
-                    $column->getColumnDefinition()->isNullable(),
-                    false,
-                    null,
-                    [],
-                );
-            }
-
-            $tableMetadata = [
-                'KBC.name' => $tableDef->getTableName(),
-                Common::KBC_METADATA_KEY_BACKEND => SnowflakeDatatype::METADATA_BACKEND,
-            ];
-
-            $tableManifestOptions = new ManifestOptions();
-            $tableManifestOptions
-                ->setTableMetadata($tableMetadata)
-                ->setSchema($schema)
-                ->setManifestType(ManifestOptions::MANIFEST_TYPE_OUTPUT)
-            ;
-
+        $tableComments = $this->getTableComments(array_map(
+            fn(array $table): string => $table['definition']->getTableName(),
+            $tableStructures,
+        ));
+        foreach ($tableStructures as $table) {
+            $tableDef = $table['definition'];
             $manifestManager->writeTableManifest(
                 $tableDef->getTableName(),
-                $tableManifestOptions,
+                self::createTableManifestOptions(
+                    $tableDef,
+                    $table['columnComments'],
+                    $tableComments[$tableDef->getTableName()] ?? null,
+                    $usingLegacyManifest,
+                ),
                 $usingLegacyManifest,
             );
         }
+    }
+
+    /**
+     * @param array<string, string|null> $columnComments
+     * @throws \Keboola\Component\Manifest\ManifestManager\Options\OptionsValidationException
+     */
+    public static function createTableManifestOptions(
+        SnowflakeTableDefinition $tableDef,
+        array $columnComments,
+        ?string $tableComment,
+        bool $usingLegacyManifest,
+    ): ManifestOptions {
+        $schema = [];
+
+        /** @var SnowflakeColumn $column */
+        foreach ($tableDef->getColumnsDefinitions() as $column) {
+            $dataTypes = [
+                'base' => [
+                    'type' => $column->getColumnDefinition()->getBasetype(),
+                ],
+                Snowflake::METADATA_BACKEND => [
+                    'type' => $column->getColumnDefinition()->getType(),
+                ],
+            ];
+
+            if ($column->getColumnDefinition()->getLength() !== null) {
+                $dataTypes['snowflake']['length'] = $column->getColumnDefinition()->getLength();
+            }
+
+            if ($column->getColumnDefinition()->getDefault() !== null) {
+                $dataTypes['base']['default'] = $column->getColumnDefinition()->getDefault();
+                $dataTypes['snowflake']['default'] = $column->getColumnDefinition()->getDefault();
+            }
+
+            $schema[] = new ManifestOptionsSchema(
+                $column->getColumnName(),
+                $dataTypes,
+                $column->getColumnDefinition()->isNullable(),
+                false,
+                self::nonEmptyComment($columnComments[$column->getColumnName()] ?? null),
+                [],
+            );
+        }
+
+        $tableMetadata = [
+            'KBC.name' => $tableDef->getTableName(),
+            Common::KBC_METADATA_KEY_BACKEND => SnowflakeDatatype::METADATA_BACKEND,
+        ];
+
+        $tableDescription = self::nonEmptyComment($tableComment);
+        // The legacy serializer drops the top-level description, so legacy manifests carry it as metadata.
+        if ($tableDescription !== null && $usingLegacyManifest) {
+            $tableMetadata[self::KBC_DESCRIPTION] = $tableDescription;
+        }
+
+        $tableManifestOptions = new ManifestOptions();
+        $tableManifestOptions
+            ->setTableMetadata($tableMetadata)
+            ->setSchema($schema)
+            ->setManifestType(ManifestOptions::MANIFEST_TYPE_OUTPUT)
+        ;
+
+        if ($tableDescription !== null && !$usingLegacyManifest) {
+            $tableManifestOptions->setDescription($tableDescription);
+        }
+
+        return $tableManifestOptions;
+    }
+
+    private static function nonEmptyComment(?string $comment): ?string
+    {
+        if ($comment === null || trim($comment) === '') {
+            return null;
+        }
+        return $comment;
+    }
+
+    /**
+     * @param string[] $tableNames
+     * @return array<string, string|null>
+     */
+    private function getTableComments(array $tableNames): array
+    {
+        if ($tableNames === []) {
+            return [];
+        }
+
+        /** @var array<array{TABLE_NAME: string, COMMENT: string|null}> $rows */
+        $rows = $this->connection->fetchAll(sprintf(
+            'SELECT "TABLE_NAME", "COMMENT" FROM INFORMATION_SCHEMA.TABLES'
+            . ' WHERE "TABLE_SCHEMA" = %s AND "TABLE_NAME" IN (%s)',
+            QueryBuilder::quote($this->databaseConfig['schema']),
+            implode(', ', array_map(fn(string $name): string => QueryBuilder::quote($name), $tableNames)),
+        ));
+
+        $comments = [];
+        foreach ($rows as $row) {
+            $comments[$row['TABLE_NAME']] = $row['COMMENT'];
+        }
+        return $comments;
     }
 
     /**
@@ -237,7 +305,7 @@ class SnowflakeTransformation
     /**
      * @throws \Keboola\Component\UserException
      * @param array<array{source: string, write_always?: bool}> $tables
-     * @return SnowflakeTableDefinition[]
+     * @return array<array{definition: SnowflakeTableDefinition, columnComments: array<string, string|null>}>
      */
     private function getTables(array $tables, bool $transformationFailed): array
     {
@@ -264,7 +332,8 @@ class SnowflakeTransformation
                  *     type: string,
                  *     default: string,
                  *     'primary key': string,
-                 *     'null?': string
+                 *     'null?': string,
+                 *     comment?: string|null
                  * }> $columnsMeta */
                 $columnsMeta = $this->connection->fetchAll((
                 sprintf(
@@ -278,20 +347,25 @@ class SnowflakeTransformation
             }
 
             $columns = [];
+            $columnComments = [];
 
             foreach ($columnsMeta as $col) {
                 if ($col['kind'] === 'COLUMN') {
                     $columns[] = SnowflakeColumn::createFromDB($col);
+                    $columnComments[$col['name']] = $col['comment'] ?? null;
                 }
             }
 
-            $defs[] = new SnowflakeTableDefinition(
-                $schema,
-                $tableName,
-                false,
-                new ColumnCollection($columns),
-                [],
-            );
+            $defs[] = [
+                'definition' => new SnowflakeTableDefinition(
+                    $schema,
+                    $tableName,
+                    false,
+                    new ColumnCollection($columns),
+                    [],
+                ),
+                'columnComments' => $columnComments,
+            ];
         }
 
         if ($missingTables) {
