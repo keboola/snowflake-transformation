@@ -169,13 +169,22 @@ class SnowflakeTransformation
             return [];
         }
 
-        /** @var array<array{TABLE_NAME: string, COMMENT: string|null}> $rows */
-        $rows = $this->connection->fetchAll(sprintf(
-            'SELECT "TABLE_NAME", "COMMENT" FROM INFORMATION_SCHEMA.TABLES'
-            . ' WHERE "TABLE_SCHEMA" = %s AND "TABLE_NAME" IN (%s)',
-            QueryBuilder::quote($this->databaseConfig['schema']),
-            implode(', ', array_map(fn(string $name): string => QueryBuilder::quote($name), $tableNames)),
-        ));
+        try {
+            /** @var array<array{TABLE_NAME: string, COMMENT: string|null}> $rows */
+            $rows = $this->connection->fetchAll(sprintf(
+                'SELECT "TABLE_NAME", "COMMENT" FROM INFORMATION_SCHEMA.TABLES'
+                . ' WHERE "TABLE_SCHEMA" = %s AND "TABLE_NAME" IN (%s)',
+                QueryBuilder::quote($this->databaseConfig['schema']),
+                implode(', ', array_map(fn(string $name): string => QueryBuilder::quote($name), $tableNames)),
+            ));
+        } catch (RuntimeException $e) {
+            // Descriptions are optional, a failure here must not fail the whole transformation.
+            $this->logger->warning(sprintf(
+                'Could not read table comments, output manifests will have no table description: "%s"',
+                $e->getMessage(),
+            ));
+            return [];
+        }
 
         $comments = [];
         foreach ($rows as $row) {
