@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a62feea4cef4fe0a0ee5f80e7dc93782",
+    "content-hash": "4a179c6663003d1b23e3a8ac16747648",
     "packages": [
         {
             "name": "brick/math",
@@ -1467,16 +1467,16 @@
         },
         {
             "name": "keboola/php-datatypes",
-            "version": "7.6.0",
+            "version": "7.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-datatypes.git",
-                "reference": "acafca2309e346206ccc69d15a5a581c45f9b28f"
+                "reference": "3704710ca3ed651b8381449ef63962deb10a4536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/acafca2309e346206ccc69d15a5a581c45f9b28f",
-                "reference": "acafca2309e346206ccc69d15a5a581c45f9b28f",
+                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/3704710ca3ed651b8381449ef63962deb10a4536",
+                "reference": "3704710ca3ed651b8381449ef63962deb10a4536",
                 "shasum": ""
             },
             "require": {
@@ -1509,9 +1509,9 @@
             "description": "PHP datatypes for databases",
             "support": {
                 "issues": "https://github.com/keboola/php-datatypes/issues",
-                "source": "https://github.com/keboola/php-datatypes/tree/7.6.0"
+                "source": "https://github.com/keboola/php-datatypes/tree/7.8.1"
             },
-            "time": "2024-03-05T09:08:00+00:00"
+            "time": "2025-08-19T08:31:34+00:00"
         },
         {
             "name": "keboola/php-utils",
