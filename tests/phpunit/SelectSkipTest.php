@@ -47,6 +47,9 @@ class SelectSkipTest extends TestCase
             'block comment before' => ['/* comment */ SELECT * FROM "missing_table"'],
             'select followed by newline' => ["SELECT\n*\nFROM \"missing_table\""],
             'select star without space' => ['SELECT* FROM "missing_table"'],
+            'slash comment before' => ["// comment\nSELECT * FROM \"missing_table\""],
+            'several slash comments before' => ["\n// first\n  // second\r\nSELECT 1"],
+            'block and slash comment before' => ["/* comment */\n// comment\nSELECT 1"],
         ];
     }
 
@@ -61,6 +64,9 @@ class SelectSkipTest extends TestCase
             'insert select' => ['INSERT INTO "output" SELECT * FROM "input"'],
             'leading whitespace create' => ["\n  CREATE TABLE \"output\" (\"id\" INT)"],
             'identifier starting with select' => ['SELECTED_ROWS'],
+            'slash comment before create' => ["// comment\nCREATE TABLE \"output\" (\"id\" INT)"],
+            'select in slash comment before create' => ["// SELECT 1\nCREATE TABLE \"output\" AS SELECT 1 AS \"id\""],
+            'slash comment only with select' => ['// SELECT 1'],
         ];
     }
 }

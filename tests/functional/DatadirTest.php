@@ -755,6 +755,7 @@ class DatadirTest extends AbstractDatadirTestCase
                                     "\nSELECT * FROM \"select_skip_missing_table\"",
                                     "-- comment\nSELECT * FROM \"select_skip_missing_table\"",
                                     '/* comment */ SELECT * FROM "select_skip_missing_table"',
+                                    "// comment\nSELECT * FROM \"select_skip_missing_table\"",
                                     // These are executed.
                                     'WITH "select_skip_cte" AS (SELECT 1 AS "id") SELECT * FROM "select_skip_cte"',
                                     'CREATE OR REPLACE TABLE "select_skip_ctas" AS SELECT 1 AS "id"',
@@ -767,7 +768,11 @@ class DatadirTest extends AbstractDatadirTestCase
         ];
         $process = $this->runAppWithConfig($config);
 
-        $this->assertStringNotContainsString('select_skip_missing_table', $process->getOutput());
+        $this->assertDoesNotMatchRegularExpression(
+            '/Running query "[^\n]*select_skip_missing_table/',
+            $process->getOutput(),
+        );
+        $this->assertEquals(6, substr_count($process->getOutput(), 'Ignoring select query'));
         $this->assertStringContainsString('Running query "WITH "select_skip_cte"', $process->getOutput());
         $this->assertStringContainsString(
             'Running query "CREATE OR REPLACE TABLE "select_skip_ctas"',
