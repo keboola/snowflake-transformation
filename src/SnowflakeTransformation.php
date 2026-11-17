@@ -263,7 +263,7 @@ class SnowflakeTransformation
                 continue;
             }
 
-            if (strtoupper(substr($uncommentedQuery, 0, 6)) === 'SELECT') {
+            if (self::isSkippedSelect($uncommentedQuery)) {
                 continue;
             }
 
@@ -285,6 +285,19 @@ class SnowflakeTransformation
                 $this->checkUserTermination();
             }
         }
+    }
+
+    /**
+     * A statement that starts with the SELECT keyword has no effect in a transformation,
+     * so it is not executed. Leading whitespace (also what is left of a leading comment)
+     * is ignored, so the decision does not depend on how the statement is formatted.
+     * SELECT must be a whole word: "SELECTED ..." is not a SELECT statement.
+     * Statements that only contain a SELECT later (WITH ... SELECT, CREATE TABLE ... AS SELECT)
+     * are executed.
+     */
+    public static function isSkippedSelect(string $uncommentedQuery): bool
+    {
+        return preg_match('/^\s*SELECT\b/i', $uncommentedQuery) === 1;
     }
 
     /**
