@@ -737,6 +737,44 @@ class DatadirTest extends AbstractDatadirTestCase
         $this->assertEquals(2, substr_count($process->getOutput(), 'Running query'));
     }
 
+    public function testSkipSelectWithLeadingWhitespaceOrComment(): void
+    {
+        $config = [
+            'authorization' => $this->getDatabaseConfig(),
+            'parameters' => [
+                'blocks' => [
+                    [
+                        'name' => 'first block',
+                        'codes' => [
+                            [
+                                'name' => 'first code',
+                                'script' => [
+                                    // These would fail if executed: the table does not exist.
+                                    'SELECT * FROM "select_skip_missing_table"',
+                                    '  SELECT * FROM "select_skip_missing_table"',
+                                    "\nSELECT * FROM \"select_skip_missing_table\"",
+                                    "-- comment\nSELECT * FROM \"select_skip_missing_table\"",
+                                    '/* comment */ SELECT * FROM "select_skip_missing_table"',
+                                    // These are executed.
+                                    'WITH "select_skip_cte" AS (SELECT 1 AS "id") SELECT * FROM "select_skip_cte"',
+                                    'CREATE OR REPLACE TABLE "select_skip_ctas" AS SELECT 1 AS "id"',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $process = $this->runAppWithConfig($config);
+
+        $this->assertStringNotContainsString('select_skip_missing_table', $process->getOutput());
+        $this->assertStringContainsString('Running query "WITH "select_skip_cte"', $process->getOutput());
+        $this->assertStringContainsString(
+            'Running query "CREATE OR REPLACE TABLE "select_skip_ctas"',
+            $process->getOutput(),
+        );
+    }
+
     public function testCastOperatorQuery(): void
     {
         // phpcs:disable Generic.Files.LineLength
