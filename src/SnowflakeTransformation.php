@@ -264,6 +264,7 @@ class SnowflakeTransformation
             }
 
             if (self::isSkippedSelect($uncommentedQuery)) {
+                $this->logger->info(sprintf('Ignoring select query "%s".', $this->queryExcerpt($query)));
                 continue;
             }
 
@@ -291,13 +292,14 @@ class SnowflakeTransformation
      * A statement that starts with the SELECT keyword has no effect in a transformation,
      * so it is not executed. Leading whitespace (also what is left of a leading comment)
      * is ignored, so the decision does not depend on how the statement is formatted.
+     * Leading "//" line comments are ignored too: Snowflake accepts them, but SqlFormatter does not remove them.
      * SELECT must be a whole word: "SELECTED ..." is not a SELECT statement.
      * Statements that only contain a SELECT later (WITH ... SELECT, CREATE TABLE ... AS SELECT)
      * are executed.
      */
     public static function isSkippedSelect(string $uncommentedQuery): bool
     {
-        return preg_match('/^\s*SELECT\b/i', $uncommentedQuery) === 1;
+        return preg_match('~^(?:\s*+//[^\n]*+(?:\n|$))*\s*SELECT\b~i', $uncommentedQuery) === 1;
     }
 
     /**
